@@ -6,8 +6,10 @@ import validation.Unique;
 import validation.Validatable;
 import validation.ValidationException;
 
+import java.util.StringJoiner;
+
 @JsonSerializable
-public class Person implements Validatable{
+public abstract class Person implements Validatable{
     @NotBlank
     private String name;
     @NotBlank
@@ -23,6 +25,19 @@ public class Person implements Validatable{
 
         //TODO add custom validation for email
 
-        if(!validate(this)) throw new ValidationException("Invalid data");
+        try{
+            if(!validate(this)) throw new ValidationException("Invalid data");
+        } catch (IllegalAccessException | ValidationException e) {
+            throw new ValidationException(e.getMessage());
+        }
+    }
+
+    @Override
+    public String toString(){
+        StringJoiner sj = new StringJoiner(", ");
+        sj.add(this.name);
+        sj.add(this.surname);
+        sj.add(this.email);
+        return sj.toString();
     }
 }
