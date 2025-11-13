@@ -1,5 +1,6 @@
 package models;
 
+import persistence.JsonCtor;
 import persistence.JsonSerializable;
 import persistence.ObjectList;
 import validation.ValidationException;
@@ -16,6 +17,8 @@ public class Employee extends Person{
     private String passportNumber;
     private static double baseSalary;
 
+
+    @JsonCtor
     public Employee(String name, String surname, String email, String peselNumber, String passportNumber){
         super(name, surname, email);
         this.peselNumber = peselNumber;
@@ -30,6 +33,7 @@ public class Employee extends Person{
         } catch (IllegalAccessException | ValidationException e) {
             throw new ValidationException(e.getMessage());
         }
+        employees.add(this);
     }
 
     @Override
@@ -39,5 +43,9 @@ public class Employee extends Person{
         sj.add(this.peselNumber);
         sj.add(this.passportNumber);
         return sj.toString();
+    }
+
+    public static void setBaseSalary(double baseSalary) {
+        Employee.baseSalary = baseSalary;
     }
 }

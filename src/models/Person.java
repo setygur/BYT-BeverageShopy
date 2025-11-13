@@ -1,5 +1,6 @@
 package models;
 
+import persistence.JsonCtor;
 import persistence.JsonSerializable;
 import validation.NotBlank;
 import validation.Unique;
@@ -18,6 +19,8 @@ public abstract class Person implements Validatable{
     @Unique
     private String email;
 
+
+    @JsonCtor
     public Person(String name, String surname, String email) {
         this.name = name;
         this.surname = surname;
