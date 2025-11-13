@@ -2,7 +2,6 @@ package models;
 
 import persistence.JsonSerializable;
 import persistence.ObjectList;
-import validation.EitherOr;
 import validation.ValidationException;
 
 import java.util.ArrayList;
@@ -13,9 +12,7 @@ import java.util.StringJoiner;
 public class Employee extends Person{
     @ObjectList
     public static List<Employee> employees = new ArrayList<>();
-    @EitherOr(dependsOn = "passportNumber")
     private String peselNumber;
-    @EitherOr(dependsOn = "peselNumber")
     private String passportNumber;
     private static double baseSalary;
 
@@ -23,6 +20,10 @@ public class Employee extends Person{
         super(name, surname, email);
         this.peselNumber = peselNumber;
         this.passportNumber = passportNumber;
+
+        if(peselNumber == null && passportNumber == null){
+            throw new ValidationException("Either pesel number or passport number must be present");
+        }
 
         try{
             if(!validate(this)) throw new ValidationException("Invalid data");
