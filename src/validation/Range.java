@@ -7,6 +7,7 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
-public @interface EitherOr {
-    String dependsOn(); //name of the attribute that should not be null if this is null or vice versa
+public @interface Range {
+    double min() default Double.NEGATIVE_INFINITY;
+    double max() default Double.POSITIVE_INFINITY;
 }
