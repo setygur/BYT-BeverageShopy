@@ -11,7 +11,6 @@ import java.time.LocalTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 public class Validator {
     //DO NOT RETAIN REFERENCES TO CLASSES
@@ -105,12 +104,6 @@ public class Validator {
                             if (v < min || v > max) {
                                 throw new ValidationException("Field " + field.getName() + " is out of range");
                             }
-                        }
-                        break;
-                    case "Derived":
-                        if (field.get(o) != null) {
-                            throw new ValidationException("Field " + field.getName() +
-                                    " is derived and should not be assigned");
                         }
                         break;
                     case "NotEmpty":
