@@ -5,6 +5,9 @@ import persistence.ObjectList;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -55,6 +58,24 @@ public class Validator {
                                         }
                                     }
                                 }
+                            }
+                        }
+                        break;
+                    case "NotFuture":
+                        if (field.get(o) == null) {
+                            continue;
+                        } else if (field.get(o) instanceof LocalDateTime) {
+                            if(((LocalDateTime) field.get(o)).isAfter(LocalDateTime.now())) {
+                                throw new ValidationException("Field " + field.getName() + " has to be before now");
+                            }
+                        } else if (field.get(o) instanceof LocalDate) {
+                            if(((LocalDate) field.get(o)).isAfter(LocalDate.now())) {
+                                throw new ValidationException("Field " + field.getName() + " has to be before now");
+                            }
+                        } else if (field.get(o) instanceof LocalTime) { //weird because it does not store date
+                            // and might get freaky
+                            if(((LocalTime) field.get(o)).isAfter(LocalTime.now())) {
+                                throw new ValidationException("Field " + field.getName() + " has to be before now");
                             }
                         }
                         break;
