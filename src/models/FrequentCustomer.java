@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @JsonSerializable
-public class FrequentCustomer extends Person{
+public class FrequentCustomer extends Person {
     @ObjectList
     public static List<FrequentCustomer> frequentCustomers = new ArrayList<>();
     @NotBlank
@@ -27,8 +27,8 @@ public class FrequentCustomer extends Person{
         this.phoneNumber = phoneNumber;
         this.amountOfOrders = amountOfOrders;
 
-        try{
-            if(!validate(this)) throw new ValidationException("Invalid data");
+        try {
+            if (!validate(this)) throw new ValidationException("Invalid data");
         } catch (IllegalAccessException | ValidationException e) {
             throw new ValidationException(e.getMessage());
         }

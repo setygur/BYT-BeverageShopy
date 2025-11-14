@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.StringJoiner;
 
 @JsonSerializable
-public class Employee extends Person{
+public class Employee extends Person {
     @ObjectList
     public static List<Employee> employees = new ArrayList<>();
     private String peselNumber;
@@ -37,7 +37,7 @@ public class Employee extends Person{
     }
 
     @Override
-    public String toString(){
+    public String toString() {
         StringJoiner sj = new StringJoiner(", ");
         sj.add(super.toString());
         sj.add(this.peselNumber);
