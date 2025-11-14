@@ -34,6 +34,7 @@ public class Cashier extends Employee {
         } catch (IllegalAccessException | ValidationException e) {
             throw new ValidationException(e.getMessage());
         }
+
         this.salary = 0.0; // TODO derive after validation
         cashiers.add(this);
     }
