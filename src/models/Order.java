@@ -1,5 +1,6 @@
 package models;
 
+import persistence.JsonCtor;
 import persistence.JsonSerializable;
 import persistence.ObjectList;
 import validation.*;
@@ -21,6 +22,7 @@ public class Order implements Validatable {
     @Derived
     private double totalPrice;
 
+    @JsonCtor
     public Order(long orderId, LocalDateTime timeOfOrder, double tip) {
         this.orderId = orderId;
         this.timeOfOrder = timeOfOrder;

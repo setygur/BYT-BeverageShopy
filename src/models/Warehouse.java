@@ -1,5 +1,6 @@
 package models;
 
+import persistence.JsonCtor;
 import persistence.JsonSerializable;
 import persistence.ObjectList;
 import validation.*;
@@ -11,6 +12,7 @@ public class Warehouse implements Validatable {
     public static List<Warehouse> warehouses = new ArrayList<>();
 
     @NotNull
+    @Range(min = 0)
     private double capacity;
 
     @Derived
@@ -19,6 +21,7 @@ public class Warehouse implements Validatable {
     @NotNull
     private boolean temperatureControlled;
 
+    @JsonCtor
     public Warehouse(double capacity, boolean temperatureControlled) {
         this.capacity = capacity;
         this.temperatureControlled = temperatureControlled;

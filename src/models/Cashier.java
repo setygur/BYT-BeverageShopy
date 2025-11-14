@@ -1,5 +1,6 @@
 package models;
 
+import persistence.JsonCtor;
 import persistence.JsonSerializable;
 import persistence.ObjectList;
 import validation.*;
@@ -18,8 +19,10 @@ public class Cashier extends Employee {
     @NotNull
     private double cashierEvaluationScore;
     @Derived
+    @Range(min = 0)
     private double salary;
 
+    @JsonCtor
     public Cashier(String name, String surname, String email, String peselNumber, String passportNumber, boolean handlesCash, String cashierId, double cashierEvaluationScore) {
         super(name, surname, email, peselNumber, passportNumber);
         this.handlesCash = handlesCash;

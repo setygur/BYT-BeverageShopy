@@ -1,6 +1,7 @@
 package models;
 
 import models.utils.TypeOfMilk;
+import persistence.JsonCtor;
 import persistence.JsonSerializable;
 import persistence.ObjectList;
 import validation.*;
@@ -14,6 +15,7 @@ public class Milk implements Validatable {
     @NotNull
     private TypeOfMilk typeOfMilk;
 
+    @JsonCtor
     public Milk(TypeOfMilk typeOfMilk) {
         this.typeOfMilk = typeOfMilk;
 

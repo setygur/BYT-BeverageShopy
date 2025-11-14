@@ -1,6 +1,7 @@
 package models;
 
 import models.utils.Status;
+import persistence.JsonCtor;
 import persistence.JsonSerializable;
 import persistence.ObjectList;
 import validation.*;
@@ -22,6 +23,7 @@ public class Delivery implements Validatable {
     @NotNull
     private Status status;
 
+    @JsonCtor
     public Delivery(LocalDateTime timeStarted, LocalDateTime timeDelivered, int capacityKg, Status status) {
         this.timeStarted = timeStarted;
         this.timeDelivered = timeDelivered;

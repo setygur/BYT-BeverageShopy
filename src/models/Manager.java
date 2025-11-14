@@ -1,5 +1,6 @@
 package models;
 
+import persistence.JsonCtor;
 import persistence.JsonSerializable;
 import persistence.ObjectList;
 import validation.*;
@@ -11,12 +12,15 @@ public class Manager extends Employee {
     public static List<Manager> managers = new ArrayList<>();
 
     @NotNull
+    @Range(min = 0)
     private double managerEvaluationScore;
     @NotNull
     private double bonusPercent;
     @Derived
+    @Range(min = 0)
     private double salary;
 
+    @JsonCtor
     public Manager(String name, String surname, String email, String peselNumber, String passportNumber, double managerEvaluationScore, double bonusPercent) {
         super(name, surname, email, peselNumber, passportNumber);
         this.managerEvaluationScore = managerEvaluationScore;

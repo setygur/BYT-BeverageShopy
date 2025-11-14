@@ -1,5 +1,6 @@
 package models;
 
+import persistence.JsonCtor;
 import persistence.JsonSerializable;
 import persistence.ObjectList;
 import validation.*;
@@ -13,23 +14,26 @@ public class Drink implements Validatable {
     @NotBlank
     private String name;
     @NotNull
-    private double baseprice;
+    @Range(min = 0)
+    private double basePrice;
     @NotBlank
-    private String persistentalergens;
+    private String persistentAlergens;
 
     //Drink types
-    private boolean isCoffee;
-    private boolean isTea;
-    private boolean isMilk;
-    private boolean isFruit;
+    private Coffee coffee;
+    private Tea tea;
+    private Milk milk;
+    private Fruit fruit;
 
-    public Drink(String name, String persistentalergens, boolean isCoffee, boolean isTea, boolean isMilk, boolean isFruit) {
+    @JsonCtor
+    public Drink(String name, double basePrice, String persistentAlergens, Coffee coffee, Tea tea, Milk milk, Fruit fruit) {
         this.name = name;
-        this.persistentalergens = persistentalergens;
-        this.isCoffee = isCoffee;
-        this.isTea = isTea;
-        this.isMilk = isMilk;
-        this.isFruit = isFruit;
+        this.basePrice = basePrice;
+        this.persistentAlergens = persistentAlergens;
+        this.coffee = coffee;
+        this.tea = tea;
+        this.milk = milk;
+        this.fruit = fruit;
 
         try {
             if (!validate(this)) throw new ValidationException("Invalid data");

@@ -1,5 +1,6 @@
 package models;
 
+import persistence.JsonCtor;
 import persistence.JsonSerializable;
 import persistence.ObjectList;
 import validation.*;
@@ -11,10 +12,13 @@ public class Loader implements Validatable {
     public static List<Loader> loaders = new ArrayList<>();
 
     @NotNull
+    @Range(min = 0)
     private double loaderEvaluationScore;
     @Derived
+    @Range(min = 0)
     private double salary;
 
+    @JsonCtor
     public Loader(double loaderEvaluationScore) {
         this.loaderEvaluationScore = loaderEvaluationScore;
 

@@ -18,6 +18,7 @@ public class Main {
 
         Coffee coffee = new Coffee(6);
         List<String> fruitzz = new ArrayList<>();
+        fruitzz.add("Apple");
         Fruit smoothie = new Fruit(fruitzz, true);
     }
 }

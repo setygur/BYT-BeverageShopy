@@ -1,6 +1,7 @@
 package models;
 
 import models.utils.Address;
+import persistence.JsonCtor;
 import persistence.JsonSerializable;
 import persistence.ObjectList;
 import validation.*;
@@ -14,6 +15,7 @@ public class Facility implements Validatable {
     @NotNull
     private Address address;
 
+    @JsonCtor
     public Facility(Address address) {
         this.address = address;
 

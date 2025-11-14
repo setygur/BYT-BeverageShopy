@@ -3,6 +3,8 @@ package models;
 import persistence.JsonCtor;
 import persistence.JsonSerializable;
 import persistence.ObjectList;
+import validation.NotNull;
+import validation.Range;
 import validation.ValidationException;
 
 import java.util.ArrayList;
@@ -15,6 +17,7 @@ public class Employee extends Person {
     public static List<Employee> employees = new ArrayList<>();
     private String peselNumber;
     private String passportNumber;
+    @Range(min = 0)
     private static double baseSalary;
 
 
