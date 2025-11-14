@@ -94,9 +94,9 @@ public class JsonSerializer {
                 "}";
     }
 
-    public static String serializeObjects() throws SerializeException {
+    public static String serializeObjects(List<Class<?>> classes) throws SerializeException {
         StringJoiner sj = new StringJoiner(",\n", "{\n\"models\":{\n", "\n}\n}");
-        for (Class<?> clazz : ModelClassesList.modelClasses) {
+        for (Class<?> clazz : classes) {
             for (Field field : clazz.getDeclaredFields()) {
                 if (!field.isAnnotationPresent(ObjectList.class)) continue;
 
