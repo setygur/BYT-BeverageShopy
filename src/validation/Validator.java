@@ -28,31 +28,29 @@ public class Validator {
                         break;
                     case "NotBlank":
                         if (field.get(o) == null) {
-                            throw new ValidationException("Field " + field.getName() + " is required");
+                            throw new ValidationException("Field " + field.getName() + " is required (null)");
                         }
                         String value = field.get(o).toString();
                         value = value.trim();
                         if (value.isEmpty()) {
-                            throw new ValidationException("Field " + field.getName() + " is required");
+                            throw new ValidationException("Field " + field.getName() + " is required (empty)");
                         }
                         break;
                     case "Unique":
-                        var unique = field.get(o);
                         for (Field field1 : fields) {
                             if(field1.isAnnotationPresent(ObjectList.class)){
                                 List<Object> objectList = (List<Object>) field1.get(o);
-                                if (objectList.size() != 1) {
-                                    for (Object o2 : objectList) {
-                                        try{
-                                            o2.getClass().getField(field.getName());
-                                            if (field.get(o).toString().trim().
-                                                    equalsIgnoreCase((field1.get(o2).toString().trim()))){
-                                                throw new ValidationException("Field " + field.getName() +
-                                                        " must be unique");
-                                            }
-                                        } catch (NoSuchFieldException e) {
-                                            throw new ValidationException(e.getMessage());
+                                for (Object o2 : objectList) {
+                                    try{
+                                        Field assertField = o2.getClass().getDeclaredField(field.getName());
+                                        assertField.setAccessible(true);
+                                        if (field.get(o).toString().trim().
+                                                equalsIgnoreCase((assertField.get(o2).toString().trim()))){
+                                            throw new ValidationException("Field " + field.getName() +
+                                                    " must be unique");
                                         }
+                                    } catch (NoSuchFieldException e) {
+                                        throw new ValidationException(e.getMessage());
                                     }
                                 }
                             }
@@ -119,9 +117,42 @@ public class Validator {
                         }
                         break;
                     case "Derived":
-                        if (field.get(o) != null) {
-                            throw new ValidationException("Field " + field.getName() +
-                                    " is derived and should not be assigned");
+                        if(field.getType() == byte.class){
+                            if((byte)field.get(o) != 0){
+                                throw new ValidationException("Field " + field.getName() + " must be derived");
+                            }
+                        } else if(field.getType() == short.class){
+                            if((short)field.get(o) != 0){
+                                throw new ValidationException("Field " + field.getName() + " must be derived");
+                            }
+                        } else if(field.getType() == int.class){
+                            if((int)field.get(o) != 0){
+                                throw new ValidationException("Field " + field.getName() + " must be derived");
+                            }
+                        } else if(field.getType() == long.class){
+                            if((long)field.get(o) != 0){
+                                throw new ValidationException("Field " + field.getName() + " must be derived");
+                            }
+                        } else if(field.getType() == double.class){
+                            if((double)field.get(o) != 0.0){
+                                throw new ValidationException("Field " + field.getName() + " must be derived");
+                            }
+                        } else if(field.getType() == float.class){
+                            if((float)field.get(o) != 0.0){
+                                throw new ValidationException("Field " + field.getName() + " must be derived");
+                            }
+                        } else if(field.getType() == boolean.class){
+                            if((boolean) field.get(o)){
+                                throw new ValidationException("Field " + field.getName() + " must be derived");
+                            }
+                        } else if(field.getType() == char.class){
+                            if((char)field.get(o) != '\u0000'){
+                                throw new ValidationException("Field " + field.getName() + " must be derived");
+                            }
+                        } else {
+                            if(field.getType() != null){
+                                throw new ValidationException("Field " + field.getName() + " must be derived");
+                            }
                         }
                         break;
 //                    case "Range":

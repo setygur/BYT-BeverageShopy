@@ -13,7 +13,7 @@ public class Delivery implements Validatable {
     @ObjectList
     public static List<Delivery> deliverys = new ArrayList<>();
 
-    @NotBlank
+    @NotNull
     private LocalDateTime timeStarted;
     private LocalDateTime timeDelivered; //may be null
     @NotNull

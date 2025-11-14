@@ -23,11 +23,11 @@ public abstract class Employee extends Person {
             throw new ValidationException("Either pesel number or passport number must be present");
         }
 
-        try{
-            if(!validate(this)) throw new ValidationException("Invalid data");
-        } catch (IllegalAccessException | ValidationException e) {
-            throw new ValidationException(e.getMessage());
-        }
+//        try{
+//            if(!validate(this)) throw new ValidationException("Invalid data");
+//        } catch (IllegalAccessException | ValidationException e) {
+//            throw new ValidationException(e.getMessage());
+//        }
     }
 
     @Override
