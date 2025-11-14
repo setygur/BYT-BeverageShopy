@@ -1,4 +1,5 @@
-package tests.models;
+package tests.modelsTests;
+
 
 import models.Order;
 import org.junit.jupiter.api.Test;

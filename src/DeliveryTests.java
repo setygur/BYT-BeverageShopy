@@ -1,4 +1,4 @@
-package tests.models;
+package tests.modelsTests;
 
 import models.Delivery;
 import models.utils.Status;

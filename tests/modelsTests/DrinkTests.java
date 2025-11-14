@@ -1,4 +1,5 @@
-package tests.models;
+package tests.modelsTests;
+
 
 import models.*;
 import models.utils.TypeOfMilk;

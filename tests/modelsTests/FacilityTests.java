@@ -1,4 +1,4 @@
-package tests.models;
+package tests.modelsTests;
 
 import models.Facility;
 import models.utils.Address;

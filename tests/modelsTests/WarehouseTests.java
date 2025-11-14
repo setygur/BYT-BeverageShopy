@@ -1,4 +1,5 @@
-package tests.models;
+package tests.modelsTests;
+
 
 import models.Warehouse;
 import org.junit.jupiter.api.Test;

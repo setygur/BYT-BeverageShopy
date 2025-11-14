@@ -1,4 +1,4 @@
-package tests.models;
+package tests.modelsTests;
 
 import models.Fruit;
 import org.junit.jupiter.api.Test;
