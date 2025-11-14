@@ -6,8 +6,10 @@ import persistence.JsonSerializable;
 import persistence.ObjectList;
 import validation.*;
 
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.*;
 
 @JsonSerializable
@@ -33,8 +35,15 @@ public class Shift implements Validatable {
         } catch (IllegalAccessException | ValidationException e) {
             throw new ValidationException(e.getMessage());
         }
-        // TODO: make a derived logic
-        this.duration = 0.0;
+        LocalTime start = LocalTime.parse(beginningTime.toString());
+        LocalTime end = LocalTime.parse(endTime.toString());
+
+        this.duration = (int) Duration.between(start, end).toMinutes();
+
+        if (this.duration < 0) {
+            this.duration += 24 * 60;
+        }
+
         shifts.add(this);
     }
 }

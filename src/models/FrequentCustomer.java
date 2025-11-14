@@ -21,7 +21,7 @@ public class FrequentCustomer extends Person {
     @JsonIgnore
     @Derived
     private double calculatedDiscount;
-
+    private List<FrequentCustomer> referredCustomers = new ArrayList<>();
 
     @JsonCtor
     public FrequentCustomer(String name, String surname, String email, String phoneNumber,  int amountOfOrders) {
@@ -35,7 +35,12 @@ public class FrequentCustomer extends Person {
             throw new ValidationException(e.getMessage());
         }
 
-        this.calculatedDiscount = 0.0; //TODO add derived logic after validation
+        double refBonus = 0.0;
+        for (FrequentCustomer ref : referredCustomers) {
+            refBonus += ref.amountOfOrders / 2.0;
+        }
+        this.calculatedDiscount = this.amountOfOrders + refBonus;
+
         frequentCustomers.add(this);
     }
 }

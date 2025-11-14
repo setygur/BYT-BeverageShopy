@@ -6,7 +6,9 @@ import persistence.JsonSerializable;
 import persistence.ObjectList;
 import validation.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 @JsonSerializable
@@ -32,8 +34,12 @@ public class Shop implements Validatable {
         } catch (IllegalAccessException | ValidationException e) {
             throw new ValidationException(e.getMessage());
         }
-        this.salesNum = 0; // TODO derive after validation
-        this.daysFromLastStock = 0; // TODO derive after validation
+        LocalDate last = LocalDate.parse(dateOfLastStock.toString());
+        LocalDate now = LocalDate.now();
+
+        this.daysFromLastStock = (int) ChronoUnit.DAYS.between(last, now);
+        this.salesNum = 0;
+
         shops.add(this);
     }
 }
