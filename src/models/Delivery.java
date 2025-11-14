@@ -1,8 +1,11 @@
 package models;
 
+import models.utils.Status;
 import persistence.JsonSerializable;
 import persistence.ObjectList;
 import validation.*;
+
+import java.time.LocalDateTime;
 import java.util.*;
 
 @JsonSerializable
@@ -11,15 +14,15 @@ public class Delivery implements Validatable {
     public static List<Delivery> deliverys = new ArrayList<>();
 
     @NotBlank
-    private String timeStarted;
+    private LocalDateTime timeStarted;
     @NotBlank  // multiplicity [0..1] interpreted as optional String; drop @NotBlank if you prefer nullable
-    private String timeDelivered;
+    private LocalDateTime timeDelivered;
     @NotNull
-    private int capacityKg;
-    @NotBlank
-    private String status;
+    private double capacityKg;
+    @NotNull
+    private Status status;
 
-    public Delivery(String timeStarted, String timeDelivered, int capacityKg, String status) {
+    public Delivery(LocalDateTime timeStarted, LocalDateTime timeDelivered, int capacityKg, Status status) {
         this.timeStarted = timeStarted;
         this.timeDelivered = timeDelivered;
         this.capacityKg = capacityKg;

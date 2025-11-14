@@ -3,6 +3,8 @@ package models;
 import persistence.JsonSerializable;
 import persistence.ObjectList;
 import validation.*;
+
+import java.time.LocalDateTime;
 import java.util.*;
 
 @JsonSerializable
@@ -10,21 +12,18 @@ public class Order implements Validatable {
     @ObjectList
     public static List<Order> orders = new ArrayList<>();
 
+    @NotNull
+    @Unique
+    private long orderId;
     @NotBlank
-    private String orderId;
-    @NotBlank
-    private String timeOfOrder;
-    @NotBlank
-    private String name;
-    @NotBlank
-    private String tip;
+    private LocalDateTime timeOfOrder;
+    private double tip;
     @Derived
     private double totalPrice;
 
-    public Order(String orderId, String timeOfOrder, String name, String tip) {
+    public Order(long orderId, LocalDateTime timeOfOrder, double tip) {
         this.orderId = orderId;
         this.timeOfOrder = timeOfOrder;
-        this.name = name;
         this.tip = tip;
 
         try {

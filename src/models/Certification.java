@@ -3,6 +3,9 @@ package models;
 import persistence.JsonSerializable;
 import persistence.ObjectList;
 import validation.*;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @JsonSerializable
@@ -11,13 +14,14 @@ public class Certification implements Validatable {
     public static List<Certification> certifications = new ArrayList<>();
 
     @NotBlank
+    @Unique
     private String certificationId;
     @NotBlank
     private String certificationName;
-    @NotBlank
-    private String timeOfCompletion;
+    @NotNull
+    private LocalDateTime timeOfCompletion;
 
-    public Certification(String certificationId, String certificationName, String timeOfCompletion) {
+    public Certification(String certificationId, String certificationName, LocalDateTime timeOfCompletion) {
         this.certificationId = certificationId;
         this.certificationName = certificationName;
         this.timeOfCompletion = timeOfCompletion;

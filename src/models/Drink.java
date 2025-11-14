@@ -12,13 +12,24 @@ public class Drink implements Validatable {
 
     @NotBlank
     private String name;
-    private static double baseprice;
+    @NotNull
+    private double baseprice;
     @NotBlank
     private String persistentalergens;
 
-    public Drink(String name, String persistentalergens) {
+    //Drink types
+    private boolean isCoffee;
+    private boolean isTea;
+    private boolean isMilk;
+    private boolean isFruit;
+
+    public Drink(String name, String persistentalergens, boolean isCoffee, boolean isTea, boolean isMilk, boolean isFruit) {
         this.name = name;
         this.persistentalergens = persistentalergens;
+        this.isCoffee = isCoffee;
+        this.isTea = isTea;
+        this.isMilk = isMilk;
+        this.isFruit = isFruit;
 
         try {
             if (!validate(this)) throw new ValidationException("Invalid data");

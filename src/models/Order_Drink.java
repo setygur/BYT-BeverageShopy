@@ -1,5 +1,6 @@
 package models;
 
+import models.utils.Drink_Size;
 import persistence.JsonSerializable;
 import persistence.ObjectList;
 import validation.*;
@@ -14,12 +15,12 @@ public class Order_Drink implements Validatable {
     private boolean heated;
     @NotNull
     private boolean cooled;
-    @NotBlank
-    private String size;
+    @NotNull
+    private Drink_Size size;
     @Derived
     private double additionalCost;
 
-    public Order_Drink(boolean heated, boolean cooled, String size) {
+    public Order_Drink(boolean heated, boolean cooled, Drink_Size size) {
         this.heated = heated;
         this.cooled = cooled;
         this.size = size;

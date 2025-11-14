@@ -13,9 +13,7 @@ import java.util.StringJoiner;
 public class Employee extends Person {
     @ObjectList
     public static List<Employee> employees = new ArrayList<>();
-    @EitherOr(dependsOn = "passportNumber")
     private String peselNumber;
-    @EitherOr(dependsOn = "peselNumber")
     private String passportNumber;
     private static double baseSalary;
 

@@ -13,13 +13,14 @@ public class Cashier extends Employee {
     @NotNull
     private boolean handlesCash;
     @NotBlank
+    @Unique
     private String cashierId;
     @NotNull
-    private int cashierEvaluationScore;
+    private double cashierEvaluationScore;
     @Derived
     private double salary;
 
-    public Cashier(String name, String surname, String email, String peselNumber, String passportNumber, boolean handlesCash, String cashierId, int cashierEvaluationScore) {
+    public Cashier(String name, String surname, String email, String peselNumber, String passportNumber, boolean handlesCash, String cashierId, double cashierEvaluationScore) {
         super(name, surname, email, peselNumber, passportNumber);
         this.handlesCash = handlesCash;
         this.cashierId = cashierId;

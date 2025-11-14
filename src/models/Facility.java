@@ -1,5 +1,6 @@
 package models;
 
+import models.utils.Address;
 import persistence.JsonSerializable;
 import persistence.ObjectList;
 import validation.*;
@@ -8,12 +9,12 @@ import java.util.*;
 @JsonSerializable
 public class Facility implements Validatable {
     @ObjectList
-    public static List<Facility> facilitys = new ArrayList<>();
+    public static List<Facility> facilities = new ArrayList<>();
 
-    @NotBlank
-    private String address;
+    @NotNull
+    private Address address;
 
-    public Facility(String address) {
+    public Facility(Address address) {
         this.address = address;
 
         try {

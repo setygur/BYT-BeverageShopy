@@ -11,11 +11,11 @@ public class Loader implements Validatable {
     public static List<Loader> loaders = new ArrayList<>();
 
     @NotNull
-    private int loaderEvaluationScore;
+    private double loaderEvaluationScore;
     @Derived
     private double salary;
 
-    public Loader(int loaderEvaluationScore) {
+    public Loader(double loaderEvaluationScore) {
         this.loaderEvaluationScore = loaderEvaluationScore;
 
         try {

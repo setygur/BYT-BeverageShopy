@@ -10,12 +10,12 @@ public class Fruit implements Validatable {
     @ObjectList
     public static List<Fruit> fruits = new ArrayList<>();
 
-    @NotBlank
-    private String fruit;
+    @NotEmpty
+    private List <String> fruit;
     @NotNull
     private boolean pulp;
 
-    public Fruit(String fruit, boolean pulp) {
+    public Fruit(List <String> fruit, boolean pulp) {
         this.fruit = fruit;
         this.pulp = pulp;
 

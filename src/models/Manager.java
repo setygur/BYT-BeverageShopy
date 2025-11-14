@@ -11,13 +11,13 @@ public class Manager extends Employee {
     public static List<Manager> managers = new ArrayList<>();
 
     @NotNull
-    private int managerEvaluationScore;
+    private double managerEvaluationScore;
     @NotNull
     private double bonusPercent;
     @Derived
     private double salary;
 
-    public Manager(String name, String surname, String email, String peselNumber, String passportNumber, int managerEvaluationScore, double bonusPercent) {
+    public Manager(String name, String surname, String email, String peselNumber, String passportNumber, double managerEvaluationScore, double bonusPercent) {
         super(name, surname, email, peselNumber, passportNumber);
         this.managerEvaluationScore = managerEvaluationScore;
         this.bonusPercent = bonusPercent;

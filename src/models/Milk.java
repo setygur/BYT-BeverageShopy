@@ -1,5 +1,6 @@
 package models;
 
+import models.utils.TypeOfMilk;
 import persistence.JsonSerializable;
 import persistence.ObjectList;
 import validation.*;
@@ -10,10 +11,10 @@ public class Milk implements Validatable {
     @ObjectList
     public static List<Milk> milks = new ArrayList<>();
 
-    @NotBlank
-    private String typeOfMilk;
+    @NotNull
+    private TypeOfMilk typeOfMilk;
 
-    public Milk(String typeOfMilk) {
+    public Milk(TypeOfMilk typeOfMilk) {
         this.typeOfMilk = typeOfMilk;
 
         try {

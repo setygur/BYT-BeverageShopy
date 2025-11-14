@@ -3,6 +3,8 @@ package models;
 import persistence.JsonSerializable;
 import persistence.ObjectList;
 import validation.*;
+
+import java.time.LocalDateTime;
 import java.util.*;
 
 @JsonSerializable
@@ -12,12 +14,12 @@ public class Shop implements Validatable {
 
     @Derived
     private int salesNum;
-    @NotBlank
-    private String dateOfLastStock;
+    @NotNull
+    private LocalDateTime dateOfLastStock;
     @Derived
     private int daysFromLastStock;
 
-    public Shop(String dateOfLastStock) {
+    public Shop(LocalDateTime dateOfLastStock) {
         this.dateOfLastStock = dateOfLastStock;
 
         try {

@@ -10,10 +10,11 @@ public class Coffee implements Validatable {
     @ObjectList
     public static List<Coffee> coffees = new ArrayList<>();
 
-    @NotBlank
-    private String caffeineLevel;
+    @NotNull
+    @Range(min = 1, max = 10)
+    private int caffeineLevel;
 
-    public Coffee(String caffeineLevel) {
+    public Coffee(int caffeineLevel) {
         this.caffeineLevel = caffeineLevel;
 
         try {
