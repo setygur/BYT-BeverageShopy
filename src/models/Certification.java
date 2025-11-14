@@ -20,6 +20,7 @@ public class Certification implements Validatable {
     @NotBlank
     private String certificationName;
     @NotNull
+    @NotFuture
     private LocalDateTime timeOfCompletion;
 
     @JsonCtor

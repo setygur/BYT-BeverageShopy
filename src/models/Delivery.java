@@ -15,6 +15,7 @@ public class Delivery implements Validatable {
     public static List<Delivery> deliverys = new ArrayList<>();
 
     @NotBlank
+    @NotFuture
     private LocalDateTime timeStarted;
     @NotBlank  // multiplicity [0..1] interpreted as optional String; drop @NotBlank if you prefer nullable
     private LocalDateTime timeDelivered;

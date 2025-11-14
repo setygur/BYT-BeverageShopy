@@ -132,7 +132,52 @@ public class Validator {
                             }
                             break;
                         }
+                    case "NotFuture":
+                        Object rawDate = field.get(o);
 
+                        if (rawDate == null) {
+                            throw new ValidationException("Field " + field.getName() + " must not be null");
+                        }
+
+                        // LocalDateTime
+                        if (rawDate instanceof java.time.LocalDateTime) {
+                            java.time.LocalDateTime dateTimeValue = (java.time.LocalDateTime) rawDate;
+                            if (dateTimeValue.isAfter(java.time.LocalDateTime.now())) {
+                                throw new ValidationException("Field " + field.getName() + " must not be in the future");
+                            }
+                            break;
+                        }
+
+                        // LocalDate
+                        if (rawDate instanceof java.time.LocalDate) {
+                            java.time.LocalDate dateTimeValue = (java.time.LocalDate) rawDate;
+                            if (dateTimeValue.isAfter(java.time.LocalDate.now())) {
+                                throw new ValidationException("Field " + field.getName() + " must not be in the future");
+                            }
+                            break;
+                        }
+
+                        // Instant
+                        if (rawDate instanceof java.time.Instant) {
+                            java.time.Instant dateTimeValue = (java.time.Instant) rawDate;
+                            if (dateTimeValue.isAfter(java.time.Instant.now())) {
+                                throw new ValidationException("Field " + field.getName() + " must not be in the future");
+                            }
+                            break;
+                        }
+
+                        // ZonedDateTime
+                        if (rawDate instanceof java.time.ZonedDateTime) {
+                            java.time.ZonedDateTime dateTimeValue = (java.time.ZonedDateTime) rawDate;
+                            if (dateTimeValue.isAfter(java.time.ZonedDateTime.now())) {
+                                throw new ValidationException("Field " + field.getName() + " must not be in the future");
+                            }
+                            break;
+                        }
+
+                        throw new ValidationException(
+                                "@NotFuture is not supported on type " + rawDate.getClass().getSimpleName()
+                        );
                     default:
                         System.err.println("Annotation ignored at validation: " +
                                 annotation.annotationType().getSimpleName());

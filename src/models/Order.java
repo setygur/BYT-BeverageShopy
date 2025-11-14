@@ -17,6 +17,7 @@ public class Order implements Validatable {
     @Unique
     private long orderId;
     @NotBlank
+    @NotFuture
     private LocalDateTime timeOfOrder;
     private double tip;
     @Derived

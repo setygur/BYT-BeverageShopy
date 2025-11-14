@@ -16,6 +16,7 @@ public class Shop implements Validatable {
     @Derived
     private int salesNum;
     @NotNull
+    @NotFuture
     private LocalDateTime dateOfLastStock;
     @Derived
     private int daysFromLastStock;
