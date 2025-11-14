@@ -1,5 +1,6 @@
 package models;
 
+import persistence.JsonCtor;
 import persistence.JsonSerializable;
 import persistence.ObjectList;
 import validation.*;
@@ -19,7 +20,9 @@ public class FrequentCustomer extends Person {
     @Derived
     private double calculatedDiscount;
 
-    public FrequentCustomer(String name, String surname, String email, String phoneNumber, int amountOfOrders) {
+
+    @JsonCtor
+    public FrequentCustomer(String name, String surname, String email, String phoneNumber,  int amountOfOrders) {
         super(name, surname, email);
         this.phoneNumber = phoneNumber;
         this.amountOfOrders = amountOfOrders;
@@ -31,5 +34,6 @@ public class FrequentCustomer extends Person {
         }
 
         this.calculatedDiscount = 0.0; //TODO add derived logic after validation
+        frequentCustomers.add(this);
     }
 }

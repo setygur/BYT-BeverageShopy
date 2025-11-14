@@ -1,8 +1,8 @@
 package models;
 
+import persistence.JsonCtor;
 import persistence.JsonSerializable;
 import persistence.ObjectList;
-import validation.EitherOr;
 import validation.ValidationException;
 
 import java.util.ArrayList;
@@ -17,16 +17,23 @@ public class Employee extends Person {
     private String passportNumber;
     private static double baseSalary;
 
-    public Employee(String name, String surname, String email, String peselNumber, String passportNumber) {
+
+    @JsonCtor
+    public Employee(String name, String surname, String email, String peselNumber, String passportNumber){
         super(name, surname, email);
         this.peselNumber = peselNumber;
         this.passportNumber = passportNumber;
 
-        try {
-            if (!validate(this)) throw new ValidationException("Invalid data");
+        if(peselNumber == null && passportNumber == null){
+            throw new ValidationException("Either pesel number or passport number must be present");
+        }
+
+        try{
+            if(!validate(this)) throw new ValidationException("Invalid data");
         } catch (IllegalAccessException | ValidationException e) {
             throw new ValidationException(e.getMessage());
         }
+        employees.add(this);
     }
 
     @Override
@@ -36,5 +43,9 @@ public class Employee extends Person {
         sj.add(this.peselNumber);
         sj.add(this.passportNumber);
         return sj.toString();
+    }
+
+    public static void setBaseSalary(double baseSalary) {
+        Employee.baseSalary = baseSalary;
     }
 }
