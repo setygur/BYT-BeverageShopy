@@ -38,10 +38,10 @@ public class Shift implements Validatable {
         LocalTime start = LocalTime.parse(beginningTime.toString());
         LocalTime end = LocalTime.parse(endTime.toString());
 
-        this.duration = (int) Duration.between(start, end).toMinutes();
+        this.duration = (int) Duration.between(start, end).toHours();
 
         if (this.duration < 0) {
-            this.duration += 24 * 60;
+            throw new ValidationException("Invalid duration of the shift. Must be a positive number");
         }
 
         shifts.add(this);
