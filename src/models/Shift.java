@@ -1,5 +1,6 @@
 package models;
 
+import persistence.JsonCtor;
 import persistence.JsonIgnore;
 import persistence.JsonSerializable;
 import persistence.ObjectList;
@@ -22,6 +23,7 @@ public class Shift implements Validatable {
     @NotNull
     private LocalDateTime endTime;
 
+    @JsonCtor
     public Shift(LocalDateTime beginningTime, LocalDateTime endTime) {
         this.beginningTime = beginningTime;
         this.endTime = endTime;

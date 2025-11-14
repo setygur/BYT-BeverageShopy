@@ -1,5 +1,6 @@
 package models;
 
+import persistence.JsonCtor;
 import persistence.JsonSerializable;
 import persistence.ObjectList;
 import validation.*;
@@ -19,8 +20,10 @@ public class Certification implements Validatable {
     @NotBlank
     private String certificationName;
     @NotNull
+    @NotFuture
     private LocalDateTime timeOfCompletion;
 
+    @JsonCtor
     public Certification(String certificationId, String certificationName, LocalDateTime timeOfCompletion) {
         this.certificationId = certificationId;
         this.certificationName = certificationName;

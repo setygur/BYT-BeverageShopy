@@ -2,6 +2,8 @@ package models;
 
 import persistence.JsonCtor;
 import persistence.ObjectList;
+import validation.NotNull;
+import validation.Range;
 import validation.ValidationException;
 
 import java.util.StringJoiner;
@@ -10,6 +12,7 @@ public abstract class Employee extends Person {
     @ObjectList
     private String peselNumber;
     private String passportNumber;
+    @Range(min = 0)
     private static double baseSalary;
 
 

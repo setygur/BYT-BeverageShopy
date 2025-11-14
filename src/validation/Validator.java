@@ -107,27 +107,29 @@ public class Validator {
                             }
                         }
                         break;
-                    case "NotEmpty": //like not blank or not null but for lists, sets and maps
-                        if (field.get(o) == null) {
-                            throw new ValidationException("Field " + field.getName() + " is required");
+                    case "Derived":
+                        if (field.get(o) != null) {
+                            throw new ValidationException("Field " + field.getName() +
+                                    " is derived and should not be assigned");
                         }
-                        Type t1 = field.getGenericType();
-                        if(t1.equals(List.class)) {
-                            List list = (List) field.get(o);
-                            if (list.isEmpty()) {
-                                throw new ValidationException("Field " + field.getName() + " is required");
+                        break;
+                    case "NotEmpty":
+
+                        if (field.get(o) == null) {
+                            throw new ValidationException("Field " + field.getName() + " must not be null or empty");
+                        }
+
+                        // Strings
+                        if (field.get(o) instanceof String) {
+                            String s = ((String) field.get(o)).trim();
+                            if (s.isEmpty()) {
+                                throw new ValidationException("Field " + field.getName() + " must not be empty");
                             }
-                        } else if (t1.equals(Map.class)) {
-                            Map map = (Map) field.get(o);
-                            if (map.isEmpty()) {
-                                throw new ValidationException("Field " + field.getName() + " is required");
-                            }
-                        } else if (t1.equals(Set.class)) {
-                            Set set = (Set) field.get(o);
-                            if (set.isEmpty()) {
-                                throw new ValidationException("Field " + field.getName() + " is required");
-                            }
-                        } else if (field.get(o) instanceof java.util.Collection) {
+                            break;
+                        }
+
+                        // Collections
+                        if (field.get(o) instanceof java.util.Collection) {
                             if (((java.util.Collection<?>) field.get(o) ).isEmpty()) {
                                 throw new ValidationException("Field " + field.getName() + " must not be empty");
                             }

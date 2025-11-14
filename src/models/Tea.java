@@ -1,6 +1,7 @@
 package models;
 
 import models.utils.TypeOfTea;
+import persistence.JsonCtor;
 import persistence.JsonSerializable;
 import persistence.ObjectList;
 import validation.*;
@@ -14,6 +15,7 @@ public class Tea implements Validatable {
     @NotBlank
     private TypeOfTea typeOfTea;
 
+    @JsonCtor
     public Tea(TypeOfTea typeOfTea) {
         this.typeOfTea = typeOfTea;
 

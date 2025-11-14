@@ -1,5 +1,6 @@
 package models;
 
+import persistence.JsonCtor;
 import persistence.JsonSerializable;
 import persistence.ObjectList;
 import validation.*;
@@ -15,6 +16,7 @@ public class Fruit implements Validatable {
     @NotNull
     private boolean pulp;
 
+    @JsonCtor
     public Fruit(List <String> fruit, boolean pulp) {
         this.fruit = fruit;
         this.pulp = pulp;

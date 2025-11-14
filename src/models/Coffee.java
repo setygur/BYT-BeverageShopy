@@ -1,5 +1,6 @@
 package models;
 
+import persistence.JsonCtor;
 import persistence.JsonSerializable;
 import persistence.ObjectList;
 import validation.*;
@@ -14,6 +15,7 @@ public class Coffee implements Validatable {
     @Range(min = 1, max = 10)
     private int caffeineLevel;
 
+    @JsonCtor
     public Coffee(int caffeineLevel) {
         this.caffeineLevel = caffeineLevel;
 

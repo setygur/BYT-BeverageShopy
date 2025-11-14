@@ -1,5 +1,6 @@
 package models;
 
+import persistence.JsonCtor;
 import persistence.JsonIgnore;
 import persistence.JsonSerializable;
 import persistence.ObjectList;
@@ -16,11 +17,13 @@ public class Shop implements Validatable {
     @Derived
     private int salesNum;
     @NotNull
+    @NotFuture
     private LocalDateTime dateOfLastStock;
     @JsonIgnore
     @Derived
     private int daysFromLastStock;
 
+    @JsonCtor
     public Shop(LocalDateTime dateOfLastStock) {
         this.dateOfLastStock = dateOfLastStock;
 

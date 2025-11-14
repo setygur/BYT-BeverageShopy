@@ -1,5 +1,6 @@
 package models;
 
+import persistence.JsonCtor;
 import persistence.JsonIgnore;
 import persistence.JsonSerializable;
 import persistence.ObjectList;
@@ -19,6 +20,7 @@ public class Stock implements Validatable {
     @Derived
     private double salePrice;
 
+    @JsonCtor
     public Stock(LocalDateTime lastUpdated) {
         this.lastUpdated = lastUpdated;
 

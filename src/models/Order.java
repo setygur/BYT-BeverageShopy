@@ -1,5 +1,6 @@
 package models;
 
+import persistence.JsonCtor;
 import persistence.JsonIgnore;
 import persistence.JsonSerializable;
 import persistence.ObjectList;
@@ -17,12 +18,14 @@ public class Order implements Validatable {
     @Unique
     private long orderId;
     @NotBlank
+    @NotFuture
     private LocalDateTime timeOfOrder;
     private double tip;
     @JsonIgnore
     @Derived
     private double totalPrice;
 
+    @JsonCtor
     public Order(long orderId, LocalDateTime timeOfOrder, double tip) {
         this.orderId = orderId;
         this.timeOfOrder = timeOfOrder;
