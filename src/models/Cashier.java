@@ -1,5 +1,6 @@
 package models;
 
+import persistence.JsonIgnore;
 import persistence.JsonSerializable;
 import persistence.ObjectList;
 import validation.*;
@@ -17,10 +18,12 @@ public class Cashier extends Employee {
     private String cashierId;
     @NotNull
     private double cashierEvaluationScore;
+    @JsonIgnore
     @Derived
     private double salary;
 
-    public Cashier(String name, String surname, String email, String peselNumber, String passportNumber, boolean handlesCash, String cashierId, double cashierEvaluationScore) {
+    public Cashier(String name, String surname, String email, String peselNumber, String passportNumber,
+                   boolean handlesCash, String cashierId, double cashierEvaluationScore) {
         super(name, surname, email, peselNumber, passportNumber);
         this.handlesCash = handlesCash;
         this.cashierId = cashierId;
@@ -32,5 +35,6 @@ public class Cashier extends Employee {
             throw new ValidationException(e.getMessage());
         }
         this.salary = 0.0; // TODO derive after validation
+        cashiers.add(this);
     }
 }

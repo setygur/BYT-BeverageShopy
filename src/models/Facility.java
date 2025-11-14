@@ -22,5 +22,6 @@ public class Facility implements Validatable {
         } catch (IllegalAccessException | ValidationException e) {
             throw new ValidationException(e.getMessage());
         }
+        facilities.add(this);
     }
 }

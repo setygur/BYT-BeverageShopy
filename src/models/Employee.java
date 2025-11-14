@@ -1,18 +1,13 @@
 package models;
 
 import persistence.JsonCtor;
-import persistence.JsonSerializable;
 import persistence.ObjectList;
 import validation.ValidationException;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.StringJoiner;
 
-@JsonSerializable
-public class Employee extends Person {
+public abstract class Employee extends Person {
     @ObjectList
-    public static List<Employee> employees = new ArrayList<>();
     private String peselNumber;
     private String passportNumber;
     private static double baseSalary;
@@ -33,7 +28,6 @@ public class Employee extends Person {
         } catch (IllegalAccessException | ValidationException e) {
             throw new ValidationException(e.getMessage());
         }
-        employees.add(this);
     }
 
     @Override

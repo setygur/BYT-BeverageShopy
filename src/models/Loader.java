@@ -1,5 +1,6 @@
 package models;
 
+import persistence.JsonIgnore;
 import persistence.JsonSerializable;
 import persistence.ObjectList;
 import validation.*;
@@ -12,6 +13,7 @@ public class Loader implements Validatable {
 
     @NotNull
     private double loaderEvaluationScore;
+    @JsonIgnore
     @Derived
     private double salary;
 
@@ -24,5 +26,6 @@ public class Loader implements Validatable {
             throw new ValidationException(e.getMessage());
         }
         this.salary = 0.0; // TODO derive after validation
+        loaders.add(this);
     }
 }

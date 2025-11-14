@@ -1,5 +1,6 @@
 package models;
 
+import persistence.JsonIgnore;
 import persistence.JsonSerializable;
 import persistence.ObjectList;
 import validation.*;
@@ -18,6 +19,7 @@ public class Order implements Validatable {
     @NotBlank
     private LocalDateTime timeOfOrder;
     private double tip;
+    @JsonIgnore
     @Derived
     private double totalPrice;
 
@@ -32,5 +34,6 @@ public class Order implements Validatable {
             throw new ValidationException(e.getMessage());
         }
         this.totalPrice = 0.0; // TODO derive after validation
+        orders.add(this);
     }
 }

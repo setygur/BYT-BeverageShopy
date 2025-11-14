@@ -1,5 +1,6 @@
 package models;
 
+import persistence.JsonIgnore;
 import persistence.JsonSerializable;
 import persistence.ObjectList;
 import validation.*;
@@ -16,6 +17,7 @@ public class Shop implements Validatable {
     private int salesNum;
     @NotNull
     private LocalDateTime dateOfLastStock;
+    @JsonIgnore
     @Derived
     private int daysFromLastStock;
 
@@ -29,5 +31,6 @@ public class Shop implements Validatable {
         }
         this.salesNum = 0; // TODO derive after validation
         this.daysFromLastStock = 0; // TODO derive after validation
+        shops.add(this);
     }
 }
