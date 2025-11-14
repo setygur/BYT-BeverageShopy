@@ -22,5 +22,6 @@ public class Tea implements Validatable {
         } catch (IllegalAccessException | ValidationException e) {
             throw new ValidationException(e.getMessage());
         }
+        teas.add(this);
     }
 }

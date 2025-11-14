@@ -108,6 +108,14 @@ public class Validator {
                             if (set.isEmpty()) {
                                 throw new ValidationException("Field " + field.getName() + " is required");
                             }
+                        } else if (field.get(o) instanceof java.util.Collection) {
+                            if (((java.util.Collection<?>) field.get(o) ).isEmpty()) {
+                                throw new ValidationException("Field " + field.getName() + " must not be empty");
+                            }
+                        } else if (field.get(o).getClass().isArray()) {
+                            if (java.lang.reflect.Array.getLength(field.get(o)) == 0) {
+                                throw new ValidationException("Field " + field.getName() + " must not be empty");
+                            }
                         }
                         break;
                     case "Derived":
@@ -116,39 +124,23 @@ public class Validator {
                                     " is derived and should not be assigned");
                         }
                         break;
-                    case "Range":
-                        Range range = field.getAnnotation(Range.class);
-
-                        if(!(field.get(o) instanceof Integer)){
-                            throw new ValidationException("Field " + field.getName() + " must be numeric");
-                        }
-
-                        int numericValue = ((Number) field.get(o)).intValue();
-                        if (numericValue < range.min() || numericValue > range.max()) {
-                            throw new ValidationException("Field " + field.getName() +
-                                    " must be between " + range.min() +
-                                    " and " + range.max());
-                        }
-                    case "NotEmpty":
-                        // Collections
-                        if (field.get(o) instanceof java.util.Collection) {
-                            if (((java.util.Collection<?>) field.get(o) ).isEmpty()) {
-                                throw new ValidationException("Field " + field.getName() + " must not be empty");
-                            }
-                            break;
-                        }
-
-                        // Arrays
-                        if (field.get(o).getClass().isArray()) {
-                            if (java.lang.reflect.Array.getLength(field.get(o)) == 0) {
-                                throw new ValidationException("Field " + field.getName() + " must not be empty");
-                            }
-                            break;
-                        }
-
-                    default:
-                        System.err.println("Annotation ignored at validation: " +
-                                annotation.annotationType().getSimpleName());
+//                    case "Range":
+//                        Range range = field.getAnnotation(Range.class);
+//
+//                        if(!(field.get(o) instanceof Integer)){
+//                            throw new ValidationException("Field " + field.getName() + " must be numeric");
+//                        }
+//
+//                        int numericValue = ((Number) field.get(o)).intValue();
+//                        if (numericValue < range.min() || numericValue > range.max()) {
+//                            throw new ValidationException("Field " + field.getName() +
+//                                    " must be between " + range.min() +
+//                                    " and " + range.max());
+//                        }
+//                        break;
+//                    default:
+//                        System.err.println("Annotation ignored at validation: " +
+//                                annotation.annotationType().getSimpleName());
                 }
             }
         }

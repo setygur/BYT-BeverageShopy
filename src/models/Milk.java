@@ -22,5 +22,6 @@ public class Milk implements Validatable {
         } catch (IllegalAccessException | ValidationException e) {
             throw new ValidationException(e.getMessage());
         }
+        milks.add(this);
     }
 }

@@ -1,6 +1,7 @@
 package models;
 
 import models.utils.Drink_Size;
+import persistence.JsonIgnore;
 import persistence.JsonSerializable;
 import persistence.ObjectList;
 import validation.*;
@@ -17,6 +18,7 @@ public class Order_Drink implements Validatable {
     private boolean cooled;
     @NotNull
     private Drink_Size size;
+    @JsonIgnore
     @Derived
     private double additionalCost;
 
@@ -31,5 +33,6 @@ public class Order_Drink implements Validatable {
             throw new ValidationException(e.getMessage());
         }
         this.additionalCost = 0.0; // TODO derive after validation
+        order_Drinks.add(this);
     }
 }

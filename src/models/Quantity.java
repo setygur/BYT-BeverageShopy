@@ -16,5 +16,6 @@ public class Quantity implements Validatable {
         } catch (IllegalAccessException | ValidationException e) {
             throw new ValidationException(e.getMessage());
         }
+        quantitys.add(this);
     }
 }

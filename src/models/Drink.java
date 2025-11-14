@@ -18,23 +18,24 @@ public class Drink implements Validatable {
     private String persistentalergens;
 
     //Drink types
-    private boolean isCoffee;
-    private boolean isTea;
-    private boolean isMilk;
-    private boolean isFruit;
+    private Coffee coffee;
+    private Tea tea;
+    private Milk milk;
+    private Fruit fruit;
 
-    public Drink(String name, String persistentalergens, boolean isCoffee, boolean isTea, boolean isMilk, boolean isFruit) {
+    public Drink(String name, String persistentalergens, Coffee coffee, Tea tea, Milk milk, Fruit fruit) {
         this.name = name;
         this.persistentalergens = persistentalergens;
-        this.isCoffee = isCoffee;
-        this.isTea = isTea;
-        this.isMilk = isMilk;
-        this.isFruit = isFruit;
+        this.coffee = coffee;
+        this.tea = tea;
+        this.milk = milk;
+        this.fruit = fruit;
 
         try {
             if (!validate(this)) throw new ValidationException("Invalid data");
         } catch (IllegalAccessException | ValidationException e) {
             throw new ValidationException(e.getMessage());
         }
+        drinks.add(this);
     }
 }

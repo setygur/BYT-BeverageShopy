@@ -1,5 +1,6 @@
 package models;
 
+import persistence.JsonIgnore;
 import persistence.JsonSerializable;
 import persistence.ObjectList;
 import validation.*;
@@ -13,6 +14,7 @@ public class Warehouse implements Validatable {
     @NotNull
     private double capacity;
 
+    @JsonIgnore
     @Derived
     private double availableCapacity;
 
@@ -30,5 +32,6 @@ public class Warehouse implements Validatable {
 
         //TODO: implement derived logic
         this.availableCapacity = 0.0;
+        warehouses.add(this);
     }
 }
