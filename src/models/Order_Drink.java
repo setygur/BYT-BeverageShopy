@@ -12,7 +12,6 @@ import java.util.*;
 public class Order_Drink implements Validatable {
     @ObjectList
     public static List<Order_Drink> order_Drinks = new ArrayList<>();
-
     @NotNull
     private boolean heated;
     @NotNull
@@ -22,6 +21,8 @@ public class Order_Drink implements Validatable {
     @JsonIgnore
     @Derived
     private double additionalCost;
+    private Drink drink;
+    private List<String> toppings = new ArrayList<>();
 
     @JsonCtor
     public Order_Drink(boolean heated, boolean cooled, Drink_Size size) {
@@ -34,7 +35,19 @@ public class Order_Drink implements Validatable {
         } catch (IllegalAccessException | ValidationException e) {
             throw new ValidationException(e.getMessage());
         }
-        this.additionalCost = 0.0; // TODO derive after validation
+
+        double cost = drink.basePrice;
+
+        switch (size) {
+            case MEDIUM: cost += 2; break;
+            case BIG: cost += 4; break;
+            case XXL: cost += 6; break;
+            default: cost += 0;
+        }
+
+        cost += toppings.size() * 1.0;
+
+        this.additionalCost = cost;
         order_Drinks.add(this);
     }
 }

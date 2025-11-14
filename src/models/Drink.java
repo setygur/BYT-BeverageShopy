@@ -15,7 +15,7 @@ public class Drink implements Validatable {
     private String name;
     @NotNull
     @Range(min = 0)
-    private double basePrice;
+    public double basePrice;
     @NotBlank
     private String persistentAlergens;
 
