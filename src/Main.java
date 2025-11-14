@@ -1,5 +1,5 @@
+import models.Cashier;
 import models.Coffee;
-import models.Employee;
 import models.Fruit;
 
 import java.util.ArrayList;
@@ -8,17 +8,15 @@ import java.util.List;
 public class Main {
 
     public static void main(String[] args) {
-        Employee e = new Employee("John", "Silverhand","john@arasaka.corp",
-                "kkkkk", "PK99901");
 
-        System.out.println(e.toString());
+//        Coffee coffee = new Coffee(6);
+//        List<String> fruitzz = new ArrayList<>();
+//        Fruit smoothie = new Fruit(fruitzz, true);
 
-        Employee e2 = new Employee("John", "Silverhand","john@arasaka.corp",
-                null, "PK99901");
-
-        Coffee coffee = new Coffee(6);
-        List<String> fruitzz = new ArrayList<>();
-        fruitzz.add("Apple");
-        Fruit smoothie = new Fruit(fruitzz, true);
+        Cashier c = new Cashier(
+                "John", "Silverhand", "john@corp",
+                "99010112345", null,
+                true, "CASH-001", 4.7
+        );
     }
 }

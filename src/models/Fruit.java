@@ -26,5 +26,6 @@ public class Fruit implements Validatable {
         } catch (IllegalAccessException | ValidationException e) {
             throw new ValidationException(e.getMessage());
         }
+        fruits.add(this);
     }
 }

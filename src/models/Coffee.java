@@ -24,5 +24,6 @@ public class Coffee implements Validatable {
         } catch (IllegalAccessException | ValidationException e) {
             throw new ValidationException(e.getMessage());
         }
+        coffees.add(this);
     }
 }

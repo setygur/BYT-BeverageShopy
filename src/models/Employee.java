@@ -1,20 +1,15 @@
 package models;
 
 import persistence.JsonCtor;
-import persistence.JsonSerializable;
 import persistence.ObjectList;
 import validation.NotNull;
 import validation.Range;
 import validation.ValidationException;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.StringJoiner;
 
-@JsonSerializable
-public class Employee extends Person {
+public abstract class Employee extends Person {
     @ObjectList
-    public static List<Employee> employees = new ArrayList<>();
     private String peselNumber;
     private String passportNumber;
     @Range(min = 0)
@@ -31,12 +26,11 @@ public class Employee extends Person {
             throw new ValidationException("Either pesel number or passport number must be present");
         }
 
-        try{
-            if(!validate(this)) throw new ValidationException("Invalid data");
-        } catch (IllegalAccessException | ValidationException e) {
-            throw new ValidationException(e.getMessage());
-        }
-        employees.add(this);
+//        try{
+//            if(!validate(this)) throw new ValidationException("Invalid data");
+//        } catch (IllegalAccessException | ValidationException e) {
+//            throw new ValidationException(e.getMessage());
+//        }
     }
 
     @Override

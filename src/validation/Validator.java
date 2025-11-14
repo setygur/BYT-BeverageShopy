@@ -5,6 +5,9 @@ import persistence.ObjectList;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,33 +31,49 @@ public class Validator {
                         break;
                     case "NotBlank":
                         if (field.get(o) == null) {
-                            throw new ValidationException("Field " + field.getName() + " is required");
+                            throw new ValidationException("Field " + field.getName() + " is required (null)");
                         }
                         String value = field.get(o).toString();
                         value = value.trim();
                         if (value.isEmpty()) {
-                            throw new ValidationException("Field " + field.getName() + " is required");
+                            throw new ValidationException("Field " + field.getName() + " is required (empty)");
                         }
                         break;
                     case "Unique":
-                        var unique = field.get(o);
                         for (Field field1 : fields) {
                             if(field1.isAnnotationPresent(ObjectList.class)){
                                 List<Object> objectList = (List<Object>) field1.get(o);
-                                if (objectList.size() != 1) {
-                                    for (Object o2 : objectList) {
-                                        try{
-                                            o2.getClass().getField(field.getName());
-                                            if (field.get(o).toString().trim().
-                                                    equalsIgnoreCase((field1.get(o2).toString().trim()))){
-                                                throw new ValidationException("Field " + field.getName() +
-                                                        " must be unique");
-                                            }
-                                        } catch (NoSuchFieldException e) {
-                                            throw new ValidationException(e.getMessage());
+                                for (Object o2 : objectList) {
+                                    try{
+                                        Field assertField = o2.getClass().getDeclaredField(field.getName());
+                                        assertField.setAccessible(true);
+                                        if (field.get(o).toString().trim().
+                                                equalsIgnoreCase((assertField.get(o2).toString().trim()))){
+                                            throw new ValidationException("Field " + field.getName() +
+                                                    " must be unique");
                                         }
+                                    } catch (NoSuchFieldException e) {
+                                        throw new ValidationException(e.getMessage());
                                     }
                                 }
+                            }
+                        }
+                        break;
+                    case "NotFuture":
+                        if (field.get(o) == null) {
+                            continue;
+                        } else if (field.get(o) instanceof LocalDateTime) {
+                            if(((LocalDateTime) field.get(o)).isAfter(LocalDateTime.now())) {
+                                throw new ValidationException("Field " + field.getName() + " has to be before now");
+                            }
+                        } else if (field.get(o) instanceof LocalDate) {
+                            if(((LocalDate) field.get(o)).isAfter(LocalDate.now())) {
+                                throw new ValidationException("Field " + field.getName() + " has to be before now");
+                            }
+                        } else if (field.get(o) instanceof LocalTime) { //weird because it does not store date
+                            // and might get freaky
+                            if(((LocalTime) field.get(o)).isAfter(LocalTime.now())) {
+                                throw new ValidationException("Field " + field.getName() + " has to be before now");
                             }
                         }
                         break;
@@ -114,73 +133,68 @@ public class Validator {
                             if (((java.util.Collection<?>) field.get(o) ).isEmpty()) {
                                 throw new ValidationException("Field " + field.getName() + " must not be empty");
                             }
-                            break;
-                        }
-
-                        // Arrays
-                        if (field.get(o).getClass().isArray()) {
+                        } else if (field.get(o).getClass().isArray()) {
                             if (java.lang.reflect.Array.getLength(field.get(o)) == 0) {
                                 throw new ValidationException("Field " + field.getName() + " must not be empty");
                             }
-                            break;
                         }
-
-                        // Maps
-                        if (field.get(o) instanceof java.util.Map) {
-                            if (((java.util.Map<?, ?>) field.get(o)).isEmpty()) {
-                                throw new ValidationException("Field " + field.getName() + " must not be empty");
+                        break;
+                    case "Derived":
+                        if(field.getType() == byte.class){
+                            if((byte)field.get(o) != 0){
+                                throw new ValidationException("Field " + field.getName() + " must be derived");
                             }
-                            break;
-                        }
-                    case "NotFuture":
-                        Object rawDate = field.get(o);
-
-                        if (rawDate == null) {
-                            throw new ValidationException("Field " + field.getName() + " must not be null");
-                        }
-
-                        // LocalDateTime
-                        if (rawDate instanceof java.time.LocalDateTime) {
-                            java.time.LocalDateTime dateTimeValue = (java.time.LocalDateTime) rawDate;
-                            if (dateTimeValue.isAfter(java.time.LocalDateTime.now())) {
-                                throw new ValidationException("Field " + field.getName() + " must not be in the future");
+                        } else if(field.getType() == short.class){
+                            if((short)field.get(o) != 0){
+                                throw new ValidationException("Field " + field.getName() + " must be derived");
                             }
-                            break;
-                        }
-
-                        // LocalDate
-                        if (rawDate instanceof java.time.LocalDate) {
-                            java.time.LocalDate dateTimeValue = (java.time.LocalDate) rawDate;
-                            if (dateTimeValue.isAfter(java.time.LocalDate.now())) {
-                                throw new ValidationException("Field " + field.getName() + " must not be in the future");
+                        } else if(field.getType() == int.class){
+                            if((int)field.get(o) != 0){
+                                throw new ValidationException("Field " + field.getName() + " must be derived");
                             }
-                            break;
-                        }
-
-                        // Instant
-                        if (rawDate instanceof java.time.Instant) {
-                            java.time.Instant dateTimeValue = (java.time.Instant) rawDate;
-                            if (dateTimeValue.isAfter(java.time.Instant.now())) {
-                                throw new ValidationException("Field " + field.getName() + " must not be in the future");
+                        } else if(field.getType() == long.class){
+                            if((long)field.get(o) != 0){
+                                throw new ValidationException("Field " + field.getName() + " must be derived");
                             }
-                            break;
-                        }
-
-                        // ZonedDateTime
-                        if (rawDate instanceof java.time.ZonedDateTime) {
-                            java.time.ZonedDateTime dateTimeValue = (java.time.ZonedDateTime) rawDate;
-                            if (dateTimeValue.isAfter(java.time.ZonedDateTime.now())) {
-                                throw new ValidationException("Field " + field.getName() + " must not be in the future");
+                        } else if(field.getType() == double.class){
+                            if((double)field.get(o) != 0.0){
+                                throw new ValidationException("Field " + field.getName() + " must be derived");
                             }
-                            break;
+                        } else if(field.getType() == float.class){
+                            if((float)field.get(o) != 0.0){
+                                throw new ValidationException("Field " + field.getName() + " must be derived");
+                            }
+                        } else if(field.getType() == boolean.class){
+                            if((boolean) field.get(o)){
+                                throw new ValidationException("Field " + field.getName() + " must be derived");
+                            }
+                        } else if(field.getType() == char.class){
+                            if((char)field.get(o) != '\u0000'){
+                                throw new ValidationException("Field " + field.getName() + " must be derived");
+                            }
+                        } else {
+                            if(field.getType() != null){
+                                throw new ValidationException("Field " + field.getName() + " must be derived");
+                            }
                         }
-
-                        throw new ValidationException(
-                                "@NotFuture is not supported on type " + rawDate.getClass().getSimpleName()
-                        );
-                    default:
-                        System.err.println("Annotation ignored at validation: " +
-                                annotation.annotationType().getSimpleName());
+                        break;
+//                    case "Range":
+//                        Range range = field.getAnnotation(Range.class);
+//
+//                        if(!(field.get(o) instanceof Integer)){
+//                            throw new ValidationException("Field " + field.getName() + " must be numeric");
+//                        }
+//
+//                        int numericValue = ((Number) field.get(o)).intValue();
+//                        if (numericValue < range.min() || numericValue > range.max()) {
+//                            throw new ValidationException("Field " + field.getName() +
+//                                    " must be between " + range.min() +
+//                                    " and " + range.max());
+//                        }
+//                        break;
+//                    default:
+//                        System.err.println("Annotation ignored at validation: " +
+//                                annotation.annotationType().getSimpleName());
                 }
             }
         }

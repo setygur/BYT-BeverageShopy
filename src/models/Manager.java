@@ -1,6 +1,7 @@
 package models;
 
 import persistence.JsonCtor;
+import persistence.JsonIgnore;
 import persistence.JsonSerializable;
 import persistence.ObjectList;
 import validation.*;
@@ -16,6 +17,7 @@ public class Manager extends Employee {
     private double managerEvaluationScore;
     @NotNull
     private double bonusPercent;
+    @JsonIgnore
     @Derived
     @Range(min = 0)
     private double salary;
@@ -32,5 +34,6 @@ public class Manager extends Employee {
             throw new ValidationException(e.getMessage());
         }
         this.salary = 0.0; // TODO derive after validation
+        managers.add(this);
     }
 }

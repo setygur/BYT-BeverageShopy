@@ -1,6 +1,7 @@
 package models;
 
 import persistence.JsonCtor;
+import persistence.JsonIgnore;
 import persistence.JsonSerializable;
 import persistence.ObjectList;
 import validation.*;
@@ -17,6 +18,7 @@ public class FrequentCustomer extends Person {
     private static double baseDiscount;
     @NotNull
     private int amountOfOrders;
+    @JsonIgnore
     @Derived
     private double calculatedDiscount;
 

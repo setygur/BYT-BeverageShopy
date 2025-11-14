@@ -40,5 +40,6 @@ public class Drink implements Validatable {
         } catch (IllegalAccessException | ValidationException e) {
             throw new ValidationException(e.getMessage());
         }
+        drinks.add(this);
     }
 }

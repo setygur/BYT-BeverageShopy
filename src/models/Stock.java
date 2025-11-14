@@ -1,6 +1,7 @@
 package models;
 
 import persistence.JsonCtor;
+import persistence.JsonIgnore;
 import persistence.JsonSerializable;
 import persistence.ObjectList;
 import validation.*;
@@ -15,6 +16,7 @@ public class Stock implements Validatable {
 
     @NotBlank
     private LocalDateTime lastUpdated;
+    @JsonIgnore
     @Derived
     private double salePrice;
 
@@ -28,5 +30,6 @@ public class Stock implements Validatable {
             throw new ValidationException(e.getMessage());
         }
         this.salePrice = 0.0; // TODO derive after validation
+        stocks.add(this);
     }
 }

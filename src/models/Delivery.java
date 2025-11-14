@@ -16,9 +16,9 @@ public class Delivery implements Validatable {
 
     @NotBlank
     @NotFuture
+    @NotNull
     private LocalDateTime timeStarted;
-    @NotBlank  // multiplicity [0..1] interpreted as optional String; drop @NotBlank if you prefer nullable
-    private LocalDateTime timeDelivered;
+    private LocalDateTime timeDelivered; //may be null
     @NotNull
     private double capacityKg;
     @NotNull
@@ -36,5 +36,6 @@ public class Delivery implements Validatable {
         } catch (IllegalAccessException | ValidationException e) {
             throw new ValidationException(e.getMessage());
         }
+        deliverys.add(this);
     }
 }

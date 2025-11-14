@@ -1,6 +1,7 @@
 package models;
 
 import persistence.JsonCtor;
+import persistence.JsonIgnore;
 import persistence.JsonSerializable;
 import persistence.ObjectList;
 import validation.*;
@@ -18,6 +19,7 @@ public class Cashier extends Employee {
     private String cashierId;
     @NotNull
     private double cashierEvaluationScore;
+    @JsonIgnore
     @Derived
     @Range(min = 0)
     private double salary;
@@ -34,6 +36,8 @@ public class Cashier extends Employee {
         } catch (IllegalAccessException | ValidationException e) {
             throw new ValidationException(e.getMessage());
         }
+
         this.salary = 0.0; // TODO derive after validation
+        cashiers.add(this);
     }
 }

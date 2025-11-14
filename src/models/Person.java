@@ -34,11 +34,11 @@ public abstract class Person implements Validatable {
 
         //TODO add custom validation for email
 
-        try {
-            if (!validate(this)) throw new ValidationException("Invalid data");
-        } catch (IllegalAccessException | ValidationException e) {
-            throw new ValidationException(e.getMessage());
-        }
+//        try {
+//            if (!validate(this)) throw new ValidationException("Invalid data");
+//        } catch (IllegalAccessException | ValidationException e) {
+//            throw new ValidationException(e.getMessage());
+//        }
     }
 
     @Override

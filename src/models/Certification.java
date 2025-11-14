@@ -34,5 +34,6 @@ public class Certification implements Validatable {
         } catch (IllegalAccessException | ValidationException e) {
             throw new ValidationException(e.getMessage());
         }
+        certifications.add(this);
     }
 }
