@@ -21,9 +21,6 @@ public class Order implements Validatable {
     @NotFuture
     private LocalDateTime timeOfOrder;
     private double tip;
-    @JsonIgnore
-    @Derived
-    private double totalPrice;
 
     @JsonCtor
     public Order(long orderId, LocalDateTime timeOfOrder, double tip) {
@@ -36,7 +33,14 @@ public class Order implements Validatable {
         } catch (IllegalAccessException | ValidationException e) {
             throw new ValidationException(e.getMessage());
         }
-        this.totalPrice = 0.0; // TODO derive after validation
         orders.add(this);
+    }
+
+    public double getTotalPrice() {
+        // Mocked: sum of drink base cost + size cost + toppings cost
+        double baseCost = 5.0;
+        double sizeCost = 1.0;
+        double toppingsCost = 2.0;
+        return baseCost + sizeCost + toppingsCost + tip;
     }
 }

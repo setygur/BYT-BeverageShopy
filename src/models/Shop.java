@@ -21,9 +21,6 @@ public class Shop implements Validatable {
     @NotNull
     @NotFuture
     private LocalDateTime dateOfLastStock;
-    @JsonIgnore
-    @Derived
-    private int daysFromLastStock;
 
     @JsonCtor
     public Shop(LocalDateTime dateOfLastStock) {
@@ -34,12 +31,14 @@ public class Shop implements Validatable {
         } catch (IllegalAccessException | ValidationException e) {
             throw new ValidationException(e.getMessage());
         }
-        LocalDate last = LocalDate.parse(dateOfLastStock.toString());
-        LocalDate now = LocalDate.now();
 
-        this.daysFromLastStock = (int) ChronoUnit.DAYS.between(last, now);
         this.salesNum = 0;
 
         shops.add(this);
+    }
+
+    public int getDaysFromLastStock() {
+        if (dateOfLastStock == null) return 0;
+        return (int) ChronoUnit.DAYS.between(dateOfLastStock.toLocalDate(), LocalDate.now());
     }
 }

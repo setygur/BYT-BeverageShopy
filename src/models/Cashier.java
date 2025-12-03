@@ -19,10 +19,6 @@ public class Cashier extends Employee {
     private String cashierId;
     @NotNull
     private double cashierEvaluationScore;
-    @JsonIgnore
-    @Derived
-    @Range(min = 0)
-    private double salary;
 
     @JsonCtor
     public Cashier(String name, String surname, String email, String peselNumber, String passportNumber, boolean handlesCash, String cashierId, double cashierEvaluationScore) {
@@ -36,8 +32,22 @@ public class Cashier extends Employee {
         } catch (IllegalAccessException | ValidationException e) {
             throw new ValidationException(e.getMessage());
         }
-
-        this.salary = 0.0; // TODO derive after validation
         cashiers.add(this);
+    }
+
+    public double getHoursOnShift() {
+        // Mocked example value
+        return 40.0;
+    }
+
+    public double getTips() {
+        // Mocked example value for frequent customer registered tips
+        return 150.0;
+    }
+
+    public double getSalary() {
+        // salary = hoursOnShift * rate + tips
+        double hourlyRate = 20.0; // mocked hourly rate
+        return (getHoursOnShift() * hourlyRate) + getTips();
     }
 }

@@ -9,6 +9,8 @@ import java.util.*;
 
 @JsonSerializable
 public class Loader implements Validatable {
+    private static final int DELIVERY_BONUS = 125;
+    private static final int HOURLY_RATE = 25;
     @ObjectList
     public static List<Loader> loaders = new ArrayList<>();
 
@@ -31,5 +33,16 @@ public class Loader implements Validatable {
         }
         this.salary = 0.0; // TODO derive after validation
         loaders.add(this);
+    }
+
+    public double getSalary() {
+        // TODO get the following vars
+        double totalHours = 0;
+        double deliveries = 0;
+
+        double salary = (totalHours * HOURLY_RATE) +
+                (deliveries * DELIVERY_BONUS);
+
+        return Math.max(0, salary);
     }
 }
