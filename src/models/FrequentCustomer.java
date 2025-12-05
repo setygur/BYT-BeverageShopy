@@ -18,9 +18,6 @@ public class FrequentCustomer extends Person {
     private static double baseDiscount;
     @NotNull
     private int amountOfOrders;
-    @JsonIgnore
-    @Derived
-    private double calculatedDiscount;
     private List<FrequentCustomer> referredCustomers = new ArrayList<>();
 
     @JsonCtor
@@ -35,12 +32,19 @@ public class FrequentCustomer extends Person {
             throw new ValidationException(e.getMessage());
         }
 
+        frequentCustomers.add(this);
+    }
+
+    public int getAmountOfOrders() {
+        // Mocked value for demonstration
+        return amountOfOrders;
+    }
+
+    public double getCalculatedDiscount() {
         double refBonus = 0.0;
         for (FrequentCustomer ref : referredCustomers) {
             refBonus += ref.amountOfOrders / 2.0;
         }
-        this.calculatedDiscount = this.amountOfOrders + refBonus;
-
-        frequentCustomers.add(this);
+        return amountOfOrders + refBonus;
     }
 }

@@ -17,9 +17,6 @@ public class Shift implements Validatable {
     @ObjectList
     public static List<Shift> shifts = new ArrayList<>();
 
-    @JsonIgnore
-    @Derived
-    private double duration;
     @NotNull
     private LocalDateTime beginningTime;
     @NotNull
@@ -35,15 +32,16 @@ public class Shift implements Validatable {
         } catch (IllegalAccessException | ValidationException e) {
             throw new ValidationException(e.getMessage());
         }
-        LocalTime start = LocalTime.parse(beginningTime.toString());
-        LocalTime end = LocalTime.parse(endTime.toString());
-
-        this.duration = (int) Duration.between(start, end).toHours();
-
-        if (this.duration < 0) {
-            throw new ValidationException("Invalid duration of the shift. Must be a positive number");
-        }
 
         shifts.add(this);
+    }
+
+    public double getDuration() {
+        if (beginningTime == null || endTime == null) return 0.0;
+        double hours = Duration.between(beginningTime, endTime).toHours();
+        if (hours < 0) {
+            throw new ValidationException("Invalid duration of the shift. Must be a positive number");
+        }
+        return hours;
     }
 }

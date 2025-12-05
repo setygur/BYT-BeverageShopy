@@ -17,10 +17,6 @@ public class Manager extends Employee {
     private double managerEvaluationScore;
     @NotNull
     private double bonusPercent;
-    @JsonIgnore
-    @Derived
-    @Range(min = 0)
-    private double salary;
 
     @JsonCtor
     public Manager(String name, String surname, String email, String peselNumber, String passportNumber, double managerEvaluationScore, double bonusPercent) {
@@ -33,7 +29,20 @@ public class Manager extends Employee {
         } catch (IllegalAccessException | ValidationException e) {
             throw new ValidationException(e.getMessage());
         }
-        this.salary = 0.0; // TODO derive after validation
         managers.add(this);
+    }
+
+    private double getSpentOnShifts() {
+        return 1000.0;
+    }
+
+    private double getTrainingBonus() {
+        return 200.0;
+    }
+
+    public double getSalary() {
+        // salary = spentOnShifts + bonusForTraining + managerPercentage
+        double base = getSpentOnShifts() + getTrainingBonus();
+        return base + (base * (bonusPercent / 100.0));
     }
 }
