@@ -1,5 +1,6 @@
 package models;
 
+import models.utils.Drink_Size;
 import persistence.JsonCtor;
 import persistence.JsonIgnore;
 import persistence.JsonSerializable;
@@ -21,6 +22,7 @@ public class Order implements Validatable {
     @NotFuture
     private LocalDateTime timeOfOrder;
     private double tip;
+    private List<Order_Drink> drinks = new ArrayList<>();
 
     @JsonCtor
     public Order(long orderId, LocalDateTime timeOfOrder, double tip) {
@@ -42,5 +44,18 @@ public class Order implements Validatable {
         double sizeCost = 1.0;
         double toppingsCost = 2.0;
         return baseCost + sizeCost + toppingsCost + tip;
+    }
+
+    public void addDrinkToOrder(Drink drink, boolean heated, boolean cooled, Drink_Size size) {
+        drinks.add(new Order_Drink(drink, heated, cooled, size));
+    }
+
+    public void removeDrinkFromOrder(Drink drink, boolean heated, boolean cooled, Drink_Size size) {
+        for (Order_Drink o : drinks) {
+            if(Order_Drink.order_Drinks.equals(new Order_Drink(drink, heated, cooled, size))){
+                drinks.remove(o);
+                return;
+            }
+        }
     }
 }

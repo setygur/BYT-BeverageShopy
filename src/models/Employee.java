@@ -9,7 +9,6 @@ import validation.ValidationException;
 import java.util.StringJoiner;
 
 public abstract class Employee extends Person {
-    @ObjectList
     private String peselNumber;
     private String passportNumber;
     @Range(min = 0)
@@ -25,12 +24,6 @@ public abstract class Employee extends Person {
         if(peselNumber == null && passportNumber == null){
             throw new ValidationException("Either pesel number or passport number must be present");
         }
-
-//        try{
-//            if(!validate(this)) throw new ValidationException("Invalid data");
-//        } catch (IllegalAccessException | ValidationException e) {
-//            throw new ValidationException(e.getMessage());
-//        }
     }
 
     @Override

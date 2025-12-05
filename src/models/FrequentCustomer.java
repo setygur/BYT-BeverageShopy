@@ -47,4 +47,13 @@ public class FrequentCustomer extends Person {
         }
         return amountOfOrders + refBonus;
     }
+
+    public void addReferredCustomer(FrequentCustomer ref) {
+        if(!referredCustomers.contains(ref)) referredCustomers.add(ref);
+        else throw new IllegalArgumentException("Customer already exists");
+    }
+
+    public void removeReferredCustomer(FrequentCustomer ref) {
+        referredCustomers.remove(ref);
+    }
 }

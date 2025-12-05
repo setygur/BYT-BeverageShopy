@@ -1,5 +1,6 @@
 package models;
 
+import models.utils.OrderQualifier;
 import persistence.JsonCtor;
 import persistence.JsonIgnore;
 import persistence.JsonSerializable;
@@ -22,6 +23,8 @@ public class Shop implements Validatable {
     @NotFuture
     private LocalDateTime dateOfLastStock;
 
+    private Map<OrderQualifier, Order> orders = new HashMap<>();
+
     @JsonCtor
     public Shop(LocalDateTime dateOfLastStock) {
         this.dateOfLastStock = dateOfLastStock;
@@ -35,6 +38,22 @@ public class Shop implements Validatable {
         this.salesNum = 0;
 
         shops.add(this);
+    }
+
+    //TODO write unit tests
+    public void addOrder(LocalDateTime time, Cashier cashier, Order order) {
+        OrderQualifier key = new OrderQualifier(time, cashier);
+        if (orders.containsKey(key)) {
+            throw new IllegalArgumentException(
+                    "An order with the same TimeOfOrder and Cashier already exists."
+            );
+        }
+        orders.put(key, order);
+    }
+
+    public Order getOrder(LocalDateTime time, Cashier cashier) {
+        OrderQualifier key = new OrderQualifier(time, cashier);
+        return orders.get(key);
     }
 
     public int getDaysFromLastStock() {
