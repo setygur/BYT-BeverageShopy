@@ -17,7 +17,7 @@ public class Drink implements Validatable {
     @Range(min = 0)
     public double basePrice;
     @NotBlank
-    private String persistentAlergens;
+    private String persistentAllergens;
 
     //Drink types
     private Coffee coffee;
@@ -26,10 +26,11 @@ public class Drink implements Validatable {
     private Fruit fruit;
 
     @JsonCtor
-    public Drink(String name, double basePrice, String persistentAlergens, Coffee coffee, Tea tea, Milk milk, Fruit fruit) {
+    public Drink(String name, double basePrice, String persistentAllergens, Coffee coffee, Tea tea,
+                 Milk milk, Fruit fruit) {
         this.name = name;
         this.basePrice = basePrice;
-        this.persistentAlergens = persistentAlergens;
+        this.persistentAllergens = persistentAllergens;
         this.coffee = coffee;
         this.tea = tea;
         this.milk = milk;
