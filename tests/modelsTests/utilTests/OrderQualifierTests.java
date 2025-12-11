@@ -8,8 +8,7 @@ import validation.ValidationException;
 
 import java.time.LocalDateTime;
 
-import static org.junit.Assert.*;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class OrderQualifierTests {
     @BeforeEach
@@ -56,9 +55,9 @@ public class OrderQualifierTests {
 
         String msg = ex.getMessage().toLowerCase();
         assertTrue(
-                "Expected message related to null/required/invalid, but was: " + ex.getMessage(),
-                msg.contains("invalid") || msg.contains("null") || msg.contains("required")
-        );
+                msg.contains("invalid") || msg.contains("null") || msg.contains("required"),
+                "Expected message related to null/required/invalid, but was: " + ex.getMessage()
+                );
         assertEquals(0, OrderQualifier.orderQualifiers.size());
     }
 
@@ -72,9 +71,9 @@ public class OrderQualifierTests {
 
         String msg = ex.getMessage().toLowerCase();
         assertTrue(
-                "Expected message related to null/required/invalid, but was: " + ex.getMessage(),
-                msg.contains("invalid") || msg.contains("null") || msg.contains("required")
-        );
+                msg.contains("invalid") || msg.contains("null") || msg.contains("required"),
+                "Expected message related to null/required/invalid, but was: " + ex.getMessage()
+                );
         assertEquals(0, OrderQualifier.orderQualifiers.size());
     }
 
@@ -96,8 +95,8 @@ public class OrderQualifierTests {
         OrderQualifier q1 = new OrderQualifier(now, cashier);
         OrderQualifier q2 = new OrderQualifier(now, cashier);
 
-        assertEquals("Two qualifiers with same time and same Cashier instance should be equal",
-                q1, q2);
+        assertEquals(q1,
+                q2, "Two qualifiers with same time and same Cashier instance should be equal");
     }
 
     @Test
@@ -109,8 +108,8 @@ public class OrderQualifierTests {
         OrderQualifier q1 = new OrderQualifier(now, cashier1);
         OrderQualifier q2 = new OrderQualifier(now, cashier2);
 
-        assertNotEquals("Qualifiers with same time but different Cashier instances should not be equal",
-                q1, q2);
+        assertNotEquals(q1,
+                q2, "Qualifiers with same time but different Cashier instances should not be equal");
     }
 
     @Test
@@ -122,8 +121,8 @@ public class OrderQualifierTests {
         OrderQualifier q1 = new OrderQualifier(t1, cashier);
         OrderQualifier q2 = new OrderQualifier(t2, cashier);
 
-        assertNotEquals("Qualifiers with different times but same Cashier should not be equal",
-                q1, q2);
+        assertNotEquals(q1,
+                q2, "Qualifiers with different times but same Cashier should not be equal");
     }
 
     @Test
@@ -133,7 +132,7 @@ public class OrderQualifierTests {
 
         OrderQualifier q = new OrderQualifier(now, cashier);
 
-        assertNotEquals("OrderQualifier should not be equal to null", q, null);
+        assertNotEquals(q, null, "OrderQualifier should not be equal to null");
         assertNotEquals("OrderQualifier should not be equal to other types", q, "some string");
     }
 }

@@ -9,6 +9,7 @@ import java.util.*;
 
 @JsonSerializable
 public class Warehouse implements Validatable {
+
     @ObjectList
     public static List<Warehouse> warehouses = new ArrayList<>();
 
@@ -20,6 +21,9 @@ public class Warehouse implements Validatable {
     @Derived
     private double availableCapacity;
 
+    @JsonIgnore   // prevent infinite recursion during serialization
+    private List<Delivery> deliveries = new ArrayList<>();
+
     @NotNull
     private boolean temperatureControlled;
 
@@ -27,14 +31,22 @@ public class Warehouse implements Validatable {
     public Warehouse(double capacity, boolean temperatureControlled) {
         this.capacity = capacity;
         this.temperatureControlled = temperatureControlled;
+
         try {
             if (!validate(this)) throw new ValidationException("Invalid data");
-        } catch (IllegalAccessException | ValidationException e) {
+        } catch (Exception e) {
             throw new ValidationException(e.getMessage());
         }
 
-        //TODO: implement derived logic
         this.availableCapacity = 0.0;
         warehouses.add(this);
+    }
+
+    public void addDelivery(Delivery d) {
+        deliveries.add(d);
+    }
+
+    public List<Delivery> getDeliveries() {
+        return deliveries;
     }
 }
