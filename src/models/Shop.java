@@ -40,15 +40,44 @@ public class Shop implements Validatable {
         shops.add(this);
     }
 
-    //TODO write unit tests
     public void addOrder(LocalDateTime time, Cashier cashier, Order order) {
-        OrderQualifier key = new OrderQualifier(time, cashier);
-        if (orders.containsKey(key)) {
-            throw new IllegalArgumentException(
-                    "An order with the same TimeOfOrder and Cashier already exists."
-            );
+        if(time == null) throw new ValidationException("Invalid data");
+        if(cashier == null) throw new ValidationException("Invalid data");
+        if(order == null) throw new ValidationException("Invalid data");
+        OrderQualifier key = OrderQualifier.find(time, cashier);
+        if(key == null) {
+            key = new OrderQualifier(time, cashier); //check time and cashier !null in ctor
         }
+        if (orders.containsKey(key)) return;
         orders.put(key, order);
+        order.addShop(this);
+    }
+
+    public void removeOrder(LocalDateTime time, Cashier cashier, Order order) {
+        if(time == null) throw new ValidationException("Invalid data");
+        if(cashier == null) throw new ValidationException("Invalid data");
+        if(order == null) throw new ValidationException("Invalid data");
+        OrderQualifier key = OrderQualifier.find(time, cashier);
+        if(key == null) throw new ValidationException("Invalid data");
+        if(orders.containsKey(key)) {
+            orders.remove(key);
+            order.removeShop(this);
+        }
+    }
+
+    public void setOrder(OrderQualifier oq, Order order, OrderQualifier oq2, Order order2) {
+        if(oq == null) throw new ValidationException("Invalid data");
+        if(oq2 == null) throw new ValidationException("Invalid data");
+        if(order == null) throw new ValidationException("Invalid data");
+        if(order2 == null) throw new ValidationException("Invalid data");
+        if(orders.containsKey(oq)) {
+            if(orders.get(oq).equals(order)) {
+                orders.remove(oq);
+                order.removeShop(this);
+                orders.put(oq2, order2);
+                order2.addShop(this);
+            }
+        }
     }
 
     public Order getOrder(LocalDateTime time, Cashier cashier) {

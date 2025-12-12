@@ -30,6 +30,8 @@ public class Delivery implements Validatable {
     @NotNull
     private Status status;
 
+    private List<Loader> loaders = new ArrayList<>();
+
     // The warehouse this delivery was taken from (0..1)
     private Warehouse sourceWarehouse;
 
@@ -97,5 +99,37 @@ public class Delivery implements Validatable {
 
     public Status getStatus() {
         return status;
+    }
+
+    public boolean addLoader(Loader loader) {
+        if(loader ==  null) throw new ValidationException("Invalid data");
+        if(loaders.contains(loader)) return true;
+        if(loaders.size() >=3) throw new ValidationException("Too many loaders");
+        loaders.add(loader);
+        loader.addDelivery(this);
+        return true;
+    }
+
+    public void removeLoader(Loader loader) {
+        if(loader ==  null) throw new ValidationException("Invalid data");
+        if(!loaders.contains(loader)) return;
+        loaders.remove(loader);
+        loader.removeDelivery(this);
+    }
+
+    public void setLoader(Loader oldLoader, Loader newLoader) {
+        if(oldLoader ==  null) throw new ValidationException("Invalid data");
+        if(newLoader ==  null) throw new ValidationException("Invalid data");
+        if(loaders.contains(oldLoader)) {
+            loaders.remove(oldLoader);
+            oldLoader.removeDelivery(this);
+            if(loaders.size() >=3) throw new ValidationException("Too many loaders");
+            loaders.add(newLoader);
+            newLoader.addDelivery(this);
+        }
+    }
+
+    public List<Loader> getLoaders() {
+        return Collections.unmodifiableList(loaders);
     }
 }

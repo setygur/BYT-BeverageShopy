@@ -11,6 +11,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 
+//TODO redo
 public class FileIn {
 
     public static void readJson(Path file, Collection<Class<?>> knownModels) throws IOException {

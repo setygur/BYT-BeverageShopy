@@ -7,6 +7,8 @@ import persistence.JsonIgnore;
 import persistence.JsonSerializable;
 import persistence.ObjectList;
 import validation.*;
+
+import java.time.LocalDateTime;
 import java.util.*;
 
 @JsonSerializable
@@ -23,14 +25,18 @@ public class Order_Drink implements Validatable {
     @Derived
     private double additionalCost;
     private Drink drink;
+    private Order order;
+    @NotNull
     private List<String> toppings = new ArrayList<>();
 
     @JsonCtor
-    public Order_Drink(Drink drink, boolean heated, boolean cooled, Drink_Size size) {
+    public Order_Drink(Order order, Drink drink, boolean heated, boolean cooled, Drink_Size size, List<String> toppings) {
         this.drink = drink;
         this.heated = heated;
         this.cooled = cooled;
         this.size = size;
+        this.toppings = toppings;
+        this.order = order;
 
         try {
             if (!validate(this)) throw new ValidationException("Invalid data");
@@ -64,5 +70,73 @@ public class Order_Drink implements Validatable {
                 Objects.equals(drink, that.drink) &&
                 Objects.equals(additionalCost, that.additionalCost) &&
                 Objects.equals(toppings, that.toppings);
+    }
+
+    public static Order_Drink find(Order order, Drink drink, boolean heated, boolean cooled,
+                                   Drink_Size size,  List<String> toppings) {
+        for (Order_Drink od : order_Drinks) {
+            if(od.getOrder() == order) {
+                if(od.getDrink() == drink) {
+                    if(od.isHeated() == heated) {
+                        if(od.isCooled() == cooled) {
+                            if(od.getSize() == size) {
+                                if(od.getToppings() ==  toppings) {
+                                    return od;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    public boolean isHeated() {
+        return heated;
+    }
+
+    public void setHeated(boolean heated) {
+        this.heated = heated;
+    }
+
+    public boolean isCooled() {
+        return cooled;
+    }
+
+    public void setCooled(boolean cooled) {
+        this.cooled = cooled;
+    }
+
+    public Drink_Size getSize() {
+        return size;
+    }
+
+    public void setSize(Drink_Size size) {
+        this.size = size;
+    }
+
+    public Drink getDrink() {
+        return drink;
+    }
+
+    public void setDrink(Drink drink) {
+        this.drink = drink;
+    }
+
+    public Order getOrder() {
+        return order;
+    }
+
+    public void setOrder(Order order) {
+        this.order = order;
+    }
+
+    public List<String> getToppings() {
+        return toppings;
+    }
+
+    public void setToppings(List<String> toppings) {
+        this.toppings = toppings;
     }
 }

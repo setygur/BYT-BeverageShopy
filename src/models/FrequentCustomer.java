@@ -19,6 +19,7 @@ public class FrequentCustomer extends Person {
     @NotNull
     private int amountOfOrders;
     private List<FrequentCustomer> referredCustomers = new ArrayList<>();
+    private FrequentCustomer referrer = null;
 
     @JsonCtor
     public FrequentCustomer(String name, String surname, String email, String phoneNumber,  int amountOfOrders) {
@@ -49,11 +50,57 @@ public class FrequentCustomer extends Person {
     }
 
     public void addReferredCustomer(FrequentCustomer ref) {
-        if(!referredCustomers.contains(ref)) referredCustomers.add(ref);
-        else throw new IllegalArgumentException("Customer already exists");
+        if (ref == null) throw new ValidationException("Invalid data");
+        if (referredCustomers.contains(ref)) return;
+        for (FrequentCustomer fc : frequentCustomers) {
+            if(fc.referredCustomers.contains(ref)) throw new ValidationException("Customer already referred");
+        }
+        referredCustomers.add(ref);
+        ref.addReferrer(this);
+    }
+
+    public void addReferrer(FrequentCustomer ref) {
+        if (ref == null) throw new ValidationException("Invalid data");
+        if (referrer != null) throw new ValidationException("Customer already referred");
+        if (referrer == ref) return;
+        referrer = ref;
+        ref.addReferredCustomer(this);
     }
 
     public void removeReferredCustomer(FrequentCustomer ref) {
-        referredCustomers.remove(ref);
+        if (ref == null) throw new ValidationException("Invalid data");
+        if (referredCustomers.contains(ref)) {
+            referredCustomers.remove(ref);
+            ref.removeReferrer(this);
+        }
+    }
+
+    public void removeReferrer(FrequentCustomer ref) {
+        if (ref == null) throw new ValidationException("Invalid data");
+        if(referrer == ref){
+            referrer = null;
+            ref.removeReferredCustomer(this);
+        }
+    }
+
+    public void setReferredCustomer(FrequentCustomer ref, FrequentCustomer referred) {
+        if (ref == null) throw new ValidationException("Invalid data");
+        if (referred == null) throw new ValidationException("Invalid data");
+        if (referredCustomers.contains(ref)) {
+            referredCustomers.remove(ref);
+            ref.removeReferrer(this);
+            referredCustomers.add(referred);
+            ref.addReferrer(this);
+        }
+    }
+
+    public void setReferrer(FrequentCustomer ref, FrequentCustomer referred) {
+        if (ref == null) throw new ValidationException("Invalid data");
+        if (referred == null) throw new ValidationException("Invalid data");
+        if (referrer == ref) {
+            ref.removeReferredCustomer(this);
+            referrer = referred;
+            referrer.addReferredCustomer(this);
+        }
     }
 }

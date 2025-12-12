@@ -30,7 +30,7 @@ public class OrderQualifier implements Validatable {
         } catch (IllegalAccessException | ValidationException e) {
             throw new ValidationException(e.getMessage());
         }
-
+        orderQualifiers.add(this);
     }
 
     @Override
@@ -40,6 +40,15 @@ public class OrderQualifier implements Validatable {
         OrderQualifier that = (OrderQualifier) o;
         return Objects.equals(timeOfOrder, that.timeOfOrder) &&
                 Objects.equals(cashier, that.cashier);
+    }
+
+    public static OrderQualifier find(LocalDateTime time, Cashier cashier) {
+        for (OrderQualifier orderQualifier : orderQualifiers) {
+            if(orderQualifier.timeOfOrder.equals(time) &&  orderQualifier.cashier.equals(cashier)) {
+                return orderQualifier;
+            }
+        }
+        return null;
     }
 
     public Cashier getCashier() {
