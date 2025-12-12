@@ -11,8 +11,12 @@ import java.util.*;
 
 @JsonSerializable
 public class Facility implements Validatable {
+
     @ObjectList
-    public static List<Facility> facilities = new ArrayList<>();
+    public static final List<Facility> facilities = new ArrayList<>();
+
+    @ObjectList
+    private final List<Shift> shifts = new ArrayList<>(); // 1..*
 
     @NotNull
     private Address address;
@@ -26,12 +30,38 @@ public class Facility implements Validatable {
         this.stock = new Stock(LocalDateTime.now(), this);
 
         try {
-            if (!validate(this)) throw new ValidationException("Invalid data");
+            if (!validate(this)) throw new ValidationException("Invalid facility data");
         } catch (IllegalAccessException | ValidationException e) {
             throw new ValidationException(e.getMessage());
         }
 
         facilities.add(this);
+    }
+
+    // -------- Shift relation (1..*) --------
+
+    public void addShift(Shift shift) {
+        if (shift == null) throw new IllegalArgumentException("Shift cannot be null");
+
+        if (!shifts.contains(shift)) {
+            shifts.add(shift);
+            shift.internalAddFacility(this);
+        }
+    }
+
+    public void removeShift(Shift shift) {
+        if (shifts.remove(shift)) {
+            shift.internalRemoveFacility(this);
+        }
+    }
+
+    public void validate() {
+        if (shifts.isEmpty())
+            throw new ValidationException("Facility must have at least one Shift");
+    }
+
+    public List<Shift> getShifts() {
+        return Collections.unmodifiableList(shifts);
     }
 
     public Stock getStock() {
