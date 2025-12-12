@@ -2,7 +2,6 @@ package models;
 
 import persistence.JsonCtor;
 import persistence.ObjectList;
-import validation.NotNull;
 import validation.Range;
 import validation.ValidationException;
 
@@ -22,6 +21,9 @@ public abstract class Employee extends Person {
     @ObjectList
     private final List<Shift> shifts = new ArrayList<>(); // 0..*
 
+    @ObjectList
+    private final List<Certification> certifications = new ArrayList<>(); // Composition [0..*]
+
     @JsonCtor
     public Employee(String name, String surname, String email,
                     String peselNumber, String passportNumber) {
@@ -34,6 +36,24 @@ public abstract class Employee extends Person {
         // custom invariant
         if (peselNumber == null && passportNumber == null)
             throw new ValidationException("Either PESEL or passport must be provided");
+    }
+
+
+    public List<Certification> getCertifications() {
+        return Collections.unmodifiableList(certifications);
+    }
+
+    protected void internalAddCertification(Certification certification) {
+        if (!certifications.contains(certification)) {
+            certifications.add(certification);
+        }
+    }
+
+    public void removeCertification(Certification certification) {
+        if (certifications.contains(certification)) {
+            certifications.remove(certification);
+            certification.removeConnection();
+        }
     }
 
     @Override
