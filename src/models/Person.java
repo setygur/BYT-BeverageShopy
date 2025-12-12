@@ -2,20 +2,13 @@ package models;
 
 import persistence.JsonCtor;
 import persistence.JsonSerializable;
-import persistence.ObjectList;
 import validation.NotBlank;
 import validation.Unique;
 import validation.Validatable;
-import validation.ValidationException;
-
-import java.util.ArrayList;
-import java.util.List;
 import java.util.StringJoiner;
 
 @JsonSerializable
 public abstract class Person implements Validatable {
-    @ObjectList
-    public static List<Person> Person = new ArrayList<>();
 
     @NotBlank
     private String name;
@@ -33,12 +26,6 @@ public abstract class Person implements Validatable {
         this.email = email;
 
         //TODO add custom validation for email
-
-//        try {
-//            if (!validate(this)) throw new ValidationException("Invalid data");
-//        } catch (IllegalAccessException | ValidationException e) {
-//            throw new ValidationException(e.getMessage());
-//        }
     }
 
     @Override

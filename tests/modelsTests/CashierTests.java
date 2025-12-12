@@ -1,18 +1,21 @@
 package modelsTests;
 import models.Cashier;
+import models.Order;
+import modelsTests.utilTests.TestUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import validation.ValidationException;
 
-import java.lang.reflect.Field;
+import java.time.LocalDateTime;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class CashierTests {
 
     @BeforeEach
-    void setUp() {
-        Cashier.cashiers.clear();
+    void reset() {
+        TestUtils.resetObjectLists(Cashier.class, Order.class);
     }
 
     @Test
@@ -25,6 +28,7 @@ public class CashierTests {
                 )
         );
         assertNotNull(c);
+        assertTrue(Cashier.cashiers.contains(c));
     }
 
     @Test
@@ -36,22 +40,21 @@ public class CashierTests {
                         true, "   ", 3.2
                 )
         );
-        assertTrue(ex.getMessage().toLowerCase().contains("required") ||
-                        ex.getMessage().toLowerCase().contains("blank") ||
-                        ex.getMessage().toLowerCase().contains("invalid"),
-                "Expected a not-blank validation message but was: " + ex.getMessage());
+        assertTrue(ex.getMessage().toLowerCase().contains("required")
+                || ex.getMessage().toLowerCase().contains("blank")
+                || ex.getMessage().toLowerCase().contains("invalid"));
     }
 
     @Test
     void throws_whenCashierIdIsDuplicate() {
-        // First instance with id "CASH-XYZ"
-        Cashier first = new Cashier(
-                "Alice", "W.", "alice@corp",
-                "99010112345", null,
-                true, "CASH-XYZ", 3.9
+        assertDoesNotThrow(() ->
+                new Cashier(
+                        "Alice", "W.", "alice@corp",
+                        "99010112345", null,
+                        true, "CASH-XYZ", 3.9
+                )
         );
 
-        // Second instance uses the same cashierId -> should fail @Unique
         ValidationException ex = assertThrows(ValidationException.class, () ->
                 new Cashier(
                         "Bob", "Q.", "bob@corp",
@@ -59,8 +62,7 @@ public class CashierTests {
                         true, "CASH-XYZ", 4.1
                 )
         );
-        assertTrue(ex.getMessage().toLowerCase().contains("unique"),
-                "Expected a uniqueness validation message but was: " + ex.getMessage());
+        assertTrue(ex.getMessage().toLowerCase().contains("unique"));
     }
 
     @Test
@@ -72,26 +74,78 @@ public class CashierTests {
                         true, "CASH-777", 4.2
                 )
         );
-        assertTrue(ex.getMessage().toLowerCase().contains("either") ||
-                        ex.getMessage().toLowerCase().contains("pesel") ||
-                        ex.getMessage().toLowerCase().contains("passport"),
-                "Expected an either-or message but was: " + ex.getMessage());
+        assertTrue(ex.getMessage().toLowerCase().contains("either")
+                || ex.getMessage().toLowerCase().contains("pesel")
+                || ex.getMessage().toLowerCase().contains("passport"));
     }
 
     @Test
-    void salary_isDerived_andNotUserAssignable() throws Exception {
-        Cashier c = new Cashier(
-                "Derive", "Me", "d@corp",
-                "90010112345", null,
-                true, "CASH-900", 4.0
-        );
+    void addOrder_addsToCashierAndBackLinksToOrder() {
+        Cashier c = new Cashier("A", "B", "a@corp", "99010112345", null,
+                true, "C1", 4.0);
+        Order o = new Order(1L, LocalDateTime.now(), 0.0);
 
-        Field salaryField = Cashier.class.getDeclaredField("salary");
-        salaryField.setAccessible(true);
-        Object salary = salaryField.get(c);
+        assertDoesNotThrow(() -> c.addOrder(o));
 
-        // Current implementation sets salary = 0.0 after validation; verify it's a double and non-null
-        assertTrue(salary instanceof Double, "salary should be a double");
-        assertEquals(0.0, (Double) salary, 1e-9);
+        List<Order> cashierOrders = TestUtils.getField(c, "orders", List.class);
+        assertTrue(cashierOrders.contains(o));
+
+        Cashier orderCashier = TestUtils.getField(o, "cashier", Cashier.class);
+        assertSame(c, orderCashier);
+    }
+
+    @Test
+    void addOrder_isIdempotent_whenSameOrderAddedTwice() {
+        Cashier c = new Cashier("A", "B", "a@corp", "99010112345", null,
+                true, "C1", 4.0);
+        Order o = new Order(1L, LocalDateTime.now(), 0.0);
+
+        c.addOrder(o);
+        c.addOrder(o);
+
+        List<Order> cashierOrders = TestUtils.getField(c, "orders", List.class);
+        assertEquals(1, cashierOrders.size());
+    }
+
+    @Test
+    void removeOrder_removesFromCashierAndBackUnlinksFromOrder() {
+        Cashier c = new Cashier("A", "B", "a@corp", "99010112345", null,
+                true, "C1", 4.0);
+        Order o = new Order(1L, LocalDateTime.now(), 0.0);
+
+        c.addOrder(o);
+        assertDoesNotThrow(() -> c.removeOrder(o));
+
+        List<Order> cashierOrders = TestUtils.getField(c, "orders", List.class);
+        assertFalse(cashierOrders.contains(o));
+
+        Cashier orderCashier = TestUtils.getField(o, "cashier", Cashier.class);
+        assertNull(orderCashier);
+    }
+
+    @Test
+    void setOrder_replacesOldOrderWithNewOrder_andMaintainsBackLinks() {
+        Cashier c = new Cashier("A", "B", "a@corp", "99010112345", null,
+                true, "C1", 4.0);
+        Order oldO = new Order(1L, LocalDateTime.now(), 0.0);
+        Order newO = new Order(2L, LocalDateTime.now(), 0.0);
+
+        c.addOrder(oldO);
+
+        assertDoesNotThrow(() -> c.setOrder(oldO, newO));
+
+        List<Order> cashierOrders = TestUtils.getField(c, "orders", List.class);
+        assertFalse(cashierOrders.contains(oldO));
+        assertTrue(cashierOrders.contains(newO));
+
+        assertNull(TestUtils.getField(oldO, "cashier", Cashier.class));
+        assertSame(c, TestUtils.getField(newO, "cashier", Cashier.class));
+    }
+
+    @Test
+    void getSalary_returnsHoursTimesRatePlusTips_mockedValues() {
+        Cashier c = new Cashier("A", "B", "a@corp", "99010112345", null,
+                true, "C1", 4.0);
+        assertEquals(40.0 * 20.0 + 150.0, c.getSalary(), 1e-9);
     }
 }
