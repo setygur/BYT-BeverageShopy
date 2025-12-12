@@ -82,4 +82,20 @@ public class Delivery implements Validatable {
     public Warehouse getSourceWarehouse() {
         return sourceWarehouse;
     }
+
+    public LocalDateTime getTimeStarted() {
+        return timeStarted;
+    }
+
+    public LocalDateTime getTimeDelivered() {
+        return timeDelivered;
+    }
+
+    public double getCapacityKg() {
+        return capacityKg;
+    }
+
+    public Status getStatus() {
+        return status;
+    }
 }

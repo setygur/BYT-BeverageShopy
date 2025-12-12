@@ -40,11 +40,20 @@ public class Warehouse implements Validatable {
         warehouses.add(this);
     }
 
-    //TODO: getters + setters
-    // derived value: one drink takes around 0.3 kg of capacity
-    // so we will need to calculate all the deliveries that took the stocks from warehouse
-    // !!!!(it is implied that warehouse is full at the beginning as it has no deliveries taken from it)
+    public double getAvailableCapacity() {
+        double tmpCapacity = this.capacity;
+        for(Delivery delivery : deliveries) {
+            double deliveryCapacity = delivery.getCapacityKg();
+            if (deliveryCapacity > tmpCapacity) {
+                throw new ValidationException("Delivery capacity is greater than the total capacity");
+            } else {
+                tmpCapacity -= deliveryCapacity;
+            }
+        }
+        availableCapacity = tmpCapacity;
 
+        return availableCapacity;
+    }
 
     public void addDelivery(Delivery d) {
         deliveries.add(d);
@@ -53,4 +62,5 @@ public class Warehouse implements Validatable {
     public List<Delivery> getDeliveries() {
         return deliveries;
     }
+
 }
