@@ -1,6 +1,7 @@
 package models;
 
 import persistence.JsonCtor;
+import persistence.ObjectList;
 import validation.Range;
 import validation.ValidationException;
 
@@ -22,6 +23,9 @@ public abstract class Employee extends Person {
 
     public List<Shift> shifts = new ArrayList<>();
 
+
+    @ObjectList
+    private final List<Certification> certifications = new ArrayList<>(); // Composition [0..*]
 
     @JsonCtor
     public Employee(String name, String surname, String email,
@@ -95,6 +99,21 @@ public abstract class Employee extends Person {
                 this.trainer = newTrainer;
                 newTrainer.addTrainee(this);
             }
+
+    public List<Certification> getCertifications() {
+        return Collections.unmodifiableList(certifications);
+    }
+
+    protected void internalAddCertification(Certification certification) {
+        if (!certifications.contains(certification)) {
+            certifications.add(certification);
+        }
+    }
+
+    public void removeCertification(Certification certification) {
+        if (certifications.contains(certification)) {
+            certifications.remove(certification);
+            certification.removeConnection();
         }
     }
 
