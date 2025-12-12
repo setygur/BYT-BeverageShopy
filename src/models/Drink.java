@@ -27,6 +27,29 @@ public class Drink implements Validatable {
     private Milk milk;
     private Fruit fruit;
 
+
+    //Deliveries 0..* connection
+    private List <Delivery> deliveries = new ArrayList<>();
+
+    public void addDelivery(Delivery delivery) {
+        if (delivery != null && !deliveries.contains(delivery)) {
+            deliveries.add(delivery);
+            delivery.addDrink(this); // sync inverse
+        }
+    }
+
+    public void removeDelivery(Delivery delivery) {
+        if (delivery != null && deliveries.contains(delivery)) {
+            deliveries.remove(delivery);
+            delivery.removeDrink(this); // sync inverse
+        }
+    }
+
+    public List<Delivery> getDeliveries() {
+        return deliveries;
+    }
+
+
     @JsonCtor
     public Drink(String name, double basePrice, String persistentAllergens, Coffee coffee, Tea tea,
                  Milk milk, Fruit fruit) {

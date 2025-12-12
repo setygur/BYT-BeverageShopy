@@ -9,7 +9,7 @@ import java.util.*;
 @JsonSerializable
 public class Quantity implements Validatable {
     @ObjectList
-    public static List<Quantity> quantitys = new ArrayList<>();
+    public static List<Quantity> quantities = new ArrayList<>();
 
     //@JsonCtor
     public Quantity() {
@@ -18,6 +18,6 @@ public class Quantity implements Validatable {
         } catch (IllegalAccessException | ValidationException e) {
             throw new ValidationException(e.getMessage());
         }
-        quantitys.add(this);
+        quantities.add(this);
     }
 }

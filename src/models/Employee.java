@@ -4,11 +4,16 @@ import persistence.JsonCtor;
 import validation.Range;
 import validation.ValidationException;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.StringJoiner;
 
 public abstract class Employee extends Person {
+
     private String peselNumber;
     private String passportNumber;
+
     @Range(min = 0)
     private static double baseSalary;
 
@@ -17,14 +22,17 @@ public abstract class Employee extends Person {
 
 
     @JsonCtor
-    public Employee(String name, String surname, String email, String peselNumber, String passportNumber){
+    public Employee(String name, String surname, String email,
+                    String peselNumber, String passportNumber) {
+
         super(name, surname, email);
+
         this.peselNumber = peselNumber;
         this.passportNumber = passportNumber;
 
-        if(peselNumber == null && passportNumber == null){
-            throw new ValidationException("Either pesel number or passport number must be present");
-        }
+        // custom invariant
+        if (peselNumber == null && passportNumber == null)
+            throw new ValidationException("Either PESEL or passport must be provided");
     }
 
     public void addManager(Manager manager) {
@@ -90,11 +98,23 @@ public abstract class Employee extends Person {
 
     @Override
     public String toString() {
-        StringJoiner sj = new StringJoiner(", ");
-        sj.add(super.toString());
-        sj.add(this.peselNumber);
-        sj.add(this.passportNumber);
-        return sj.toString();
+        return new StringJoiner(", ")
+                .add(super.toString())
+                .add(String.valueOf(peselNumber))
+                .add(String.valueOf(passportNumber))
+                .toString();
+    }
+
+    protected void internalAddShift(Shift shift) {
+        if (!shifts.contains(shift)) shifts.add(shift);
+    }
+
+    protected void internalRemoveShift(Shift shift) {
+        shifts.remove(shift);
+    }
+
+    public List<Shift> getShifts() {
+        return Collections.unmodifiableList(shifts);
     }
 
     public static void setBaseSalary(double baseSalary) {
