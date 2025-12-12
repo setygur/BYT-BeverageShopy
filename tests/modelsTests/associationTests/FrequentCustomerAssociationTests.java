@@ -3,12 +3,13 @@ package modelsTests.associationTests;
 import models.FrequentCustomer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.lang.reflect.Field;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThrows;
+//import static org.junit.Assert.assertEquals;
+//import static org.junit.Assert.assertThrows;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class FrequentCustomerAssociationTests {
@@ -46,7 +47,7 @@ public class FrequentCustomerAssociationTests {
         assertDoesNotThrow(() -> main.addReferredCustomer(ref));
 
         List<FrequentCustomer> referred = getReferred(main);
-        assertEquals("Exactly one referred customer should be added", 1, referred.size());
+        assertEquals(Float.parseFloat("Exactly one referred customer should be added"), 1, referred.size());
         assertSame(ref, referred.get(0), "The added referred customer should be the one passed in");
     }
 
@@ -66,7 +67,7 @@ public class FrequentCustomerAssociationTests {
                 "Exception message should indicate duplicate customer");
 
         List<FrequentCustomer> referredAfter = getReferred(main);
-        assertEquals("Duplicate add must not change list size", 1, referredAfter.size());
+        assertEquals(Float.parseFloat("Duplicate add must not change list size"), 1, referredAfter.size());
     }
 
     @Test
@@ -83,7 +84,7 @@ public class FrequentCustomerAssociationTests {
         main.removeReferredCustomer(ref1);
 
         List<FrequentCustomer> referredAfter = getReferred(main);
-        assertEquals("One referred customer should remain after removal", 1, referredAfter.size());
+        assertEquals(Float.parseFloat("One referred customer should remain after removal"), 1, referredAfter.size());
         assertSame(ref2, referredAfter.get(0), "The remaining referred customer should be ref2");
     }
 
@@ -100,7 +101,7 @@ public class FrequentCustomerAssociationTests {
         assertDoesNotThrow(() -> main.removeReferredCustomer(nonExistingRef));
 
         List<FrequentCustomer> referredAfter = getReferred(main);
-        assertEquals("List size should remain unchanged", 1, referredAfter.size());
+        assertEquals(Float.parseFloat("List size should remain unchanged"), 1, referredAfter.size());
         assertSame(existingRef, referredAfter.get(0));
     }
 }
