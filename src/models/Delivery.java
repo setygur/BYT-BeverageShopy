@@ -9,11 +9,13 @@ import validation.*;
 import java.time.LocalDateTime;
 import java.util.*;
 
+import static models.Drink.drinks;
+
 @JsonSerializable
 public class Delivery implements Validatable {
 
     @ObjectList
-    public static List<Delivery> deliverys = new ArrayList<>();
+    public static List<Delivery> deliveries = new ArrayList<>();
 
     @NotBlank
     @NotFuture
@@ -30,6 +32,27 @@ public class Delivery implements Validatable {
 
     // The warehouse this delivery was taken from (0..1)
     private Warehouse sourceWarehouse;
+
+    // Drinks contained at delivery (0..*)
+    private List<Drink> drinks = new ArrayList<>();
+
+    public void addDrink(Drink drink) {
+        if (drink != null && !drinks.contains(drink)) {
+            drinks.add(drink);
+            drink.addDelivery(this); // sync inverse
+        }
+    }
+
+    public void removeDrink(Drink drink) {
+        if (drink != null && drinks.contains(drink)) {
+            drinks.remove(drink);
+            drink.removeDelivery(this); // sync inverse
+        }
+    }
+
+    public List<Drink> getDrinks() {
+        return drinks;
+    }
 
     @JsonCtor
     public Delivery(LocalDateTime timeStarted,
@@ -53,7 +76,7 @@ public class Delivery implements Validatable {
         if (sourceWarehouse != null)
             sourceWarehouse.addDelivery(this);
 
-        deliverys.add(this);
+        deliveries.add(this);
     }
 
     public Warehouse getSourceWarehouse() {
