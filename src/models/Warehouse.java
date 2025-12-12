@@ -37,10 +37,14 @@ public class Warehouse implements Validatable {
         } catch (Exception e) {
             throw new ValidationException(e.getMessage());
         }
-
-        this.availableCapacity = 0.0;
         warehouses.add(this);
     }
+
+    //TODO: getters + setters
+    // derived value: one drink takes around 0.3 kg of capacity
+    // so we will need to calculate all the deliveries that took the stocks from warehouse
+    // !!!!(it is implied that warehouse is full at the beginning as it has no deliveries taken from it)
+
 
     public void addDelivery(Delivery d) {
         deliveries.add(d);
