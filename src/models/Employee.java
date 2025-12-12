@@ -20,6 +20,8 @@ public abstract class Employee extends Person {
     private Manager manager;
     private Manager trainer;
 
+    public List<Shift> shifts = new ArrayList<>();
+
 
     @JsonCtor
     public Employee(String name, String surname, String email,
