@@ -91,14 +91,16 @@ public abstract class Employee extends Person {
     }
 
     public void setTrainer(Manager oldTrainer,  Manager newTrainer) {
-        if(oldTrainer == null) throw new ValidationException("Invalid data");
-        if(newTrainer == null) throw new ValidationException("Invalid data");
-        if(this.trainer != null && this.trainer != newTrainer){
-            if(this.trainer == oldTrainer){
+        if (oldTrainer == null) throw new ValidationException("Invalid data");
+        if (newTrainer == null) throw new ValidationException("Invalid data");
+        if (this.trainer != null && this.trainer != newTrainer) {
+            if (this.trainer == oldTrainer) {
                 oldTrainer.removeTrainee(this);
                 this.trainer = newTrainer;
                 newTrainer.addTrainee(this);
             }
+        }
+    }
 
     public List<Certification> getCertifications() {
         return Collections.unmodifiableList(certifications);
