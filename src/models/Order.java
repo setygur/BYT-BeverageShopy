@@ -1,6 +1,7 @@
 package models;
 
 import models.utils.Drink_Size;
+import models.utils.EmployeeType;
 import persistence.JsonCtor;
 import persistence.JsonIgnore;
 import persistence.JsonSerializable;
@@ -23,7 +24,7 @@ public class Order implements Validatable {
     private LocalDateTime timeOfOrder;
     private double tip;
     private List<Order_Drink> drinks = new ArrayList<>();
-    private Cashier cashier;
+    private Employee cashier;
     private Shop shop;
 
     @JsonCtor
@@ -65,14 +66,17 @@ public class Order implements Validatable {
         }
     }
 
-    public void addCashier(Cashier cashier) {
+    public void addCashier(Employee cashier) {
         if (cashier == null) throw new ValidationException("Invalid data");
+        if(cashier.getType() != EmployeeType.CASHIER){
+            throw new ValidationException("Only Cashier can perform this order");
+        }
         if (this.cashier == cashier) return;
         this.cashier = cashier;
         cashier.addOrder(this);
     }
 
-    public void removeCashier(Cashier cashier) {
+    public void removeCashier(Employee cashier) {
         if (cashier == null) throw new ValidationException("Invalid data");
         if (this.cashier == cashier) {
             this.cashier = null;
@@ -80,7 +84,7 @@ public class Order implements Validatable {
         }
     }
 
-    public void setCashier(Cashier oldCashier,  Cashier newCashier) {
+    public void setCashier(Employee oldCashier,  Employee newCashier) {
         if (oldCashier == null) throw new ValidationException("Invalid data");
         if (newCashier == null) throw new ValidationException("Invalid data");
         if (this.cashier == oldCashier) {

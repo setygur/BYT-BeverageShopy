@@ -40,7 +40,7 @@ public class Shop implements Validatable {
         shops.add(this);
     }
 
-    public void addOrder(LocalDateTime time, Cashier cashier, Order order) {
+    public void addOrder(LocalDateTime time, Employee cashier, Order order) {
         if(time == null) throw new ValidationException("Invalid data");
         if(cashier == null) throw new ValidationException("Invalid data");
         if(order == null) throw new ValidationException("Invalid data");
@@ -53,7 +53,7 @@ public class Shop implements Validatable {
         order.addShop(this);
     }
 
-    public void removeOrder(LocalDateTime time, Cashier cashier, Order order) {
+    public void removeOrder(LocalDateTime time, Employee cashier, Order order) {
         if(time == null) throw new ValidationException("Invalid data");
         if(cashier == null) throw new ValidationException("Invalid data");
         if(order == null) throw new ValidationException("Invalid data");
@@ -80,7 +80,7 @@ public class Shop implements Validatable {
         }
     }
 
-    public Order getOrder(LocalDateTime time, Cashier cashier) {
+    public Order getOrder(LocalDateTime time, Employee cashier) {
         OrderQualifier key = new OrderQualifier(time, cashier);
         return orders.get(key);
     }

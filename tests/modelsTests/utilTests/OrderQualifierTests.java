@@ -1,6 +1,5 @@
 package modelsTests.utilTests;
 
-import models.Cashier;
 import models.utils.OrderQualifier;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

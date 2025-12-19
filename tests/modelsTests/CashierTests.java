@@ -1,5 +1,4 @@
 package modelsTests;
-import models.Cashier;
 import models.Order;
 import modelsTests.utilTests.TestUtils;
 import org.junit.jupiter.api.BeforeEach;
