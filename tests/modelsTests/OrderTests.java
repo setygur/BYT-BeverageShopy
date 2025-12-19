@@ -185,11 +185,16 @@ public class OrderTests {
                 List.of()
         );
 
+
         List<Order_Drink> orderDrinks = TestUtils.getField(o, "drinks", List.class);
         List<Order_Drink> drinkOrders = TestUtils.getField(d, "orders", List.class);
 
-        assertTrue(orderDrinks.contains(od));
-        assertTrue(drinkOrders.contains(od));
+        Order_Drink association = orderDrinks.get(0);
+
+        assertEquals(o, association.getOrder());
+        assertEquals(d, association.getDrink());
+
+        assertTrue(drinkOrders.contains(association), "Drink's list should contain the association object");
     }
 
     private void setShopDirect(Order order, Shop shop) {

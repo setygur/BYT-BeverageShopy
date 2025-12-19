@@ -351,13 +351,6 @@ public class Employee extends Person {
         }
     }
 
-
-    public void addShift(Shift shift) {
-        if (!shifts.contains(shift)) {
-            shifts.add(shift);
-        }
-    }
-
     public void removeShift(Shift shift) {
         if (shift == null) throw new ValidationException("Invalid data");
 
@@ -412,23 +405,5 @@ public class Employee extends Person {
                 shift.addEmployee(this);
             }
         }
-    }
-
-    public void removeShift(Shift shift) {
-        if (shift == null) throw new ValidationException("Invalid data");
-        if (shifts.contains(shift)) {
-            shifts.remove(shift);
-            if (shift.getEmployees().contains(this)) {
-                shift.removeEmployee(this);
-            }
-        }
-    }
-
-    public List<Shift> getShifts() {
-        return Collections.unmodifiableList(shifts);
-    }
-
-    public static void setBaseSalary(double baseSalary) {
-        Employee.baseSalary = baseSalary;
     }
 }
