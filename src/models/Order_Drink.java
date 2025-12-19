@@ -1,142 +1,128 @@
 package models;
 
+import models.aspects.*;
 import models.utils.Drink_Size;
-import models.utils.OrderQualifier;
-import persistence.JsonCtor;
-import persistence.JsonIgnore;
-import persistence.JsonSerializable;
-import persistence.ObjectList;
 import validation.*;
 
-import java.time.LocalDateTime;
 import java.util.*;
 
-@JsonSerializable
 public class Order_Drink implements Validatable {
-    @ObjectList
+
     public static List<Order_Drink> order_Drinks = new ArrayList<>();
+
+    private final Order order;
+    private final Drink drink;
+
+    // === ASPECTS ===
     @NotNull
-    private boolean heated;
+    private final TemperatureAspect temperature;        // disjoint + complete
+    private final Set<SweetenerAspect> sweeteners;       // overlapping + incomplete
+
     @NotNull
-    private boolean cooled;
+    private final Drink_Size size;
+
     @NotNull
-    private Drink_Size size;
-    @JsonIgnore
+    private final List<String> toppings;
+
     @Derived
-    private double additionalCost;
-    private Drink drink;
-    private Order order;
-    @NotNull
-    private List<String> toppings = new ArrayList<>();
+    private final double additionalCost;
 
-    @JsonCtor
-    public Order_Drink(Order order, Drink drink, boolean heated, boolean cooled, Drink_Size size, List<String> toppings) {
-        this.drink = drink;
-        this.heated = heated;
-        this.cooled = cooled;
-        this.size = size;
-        this.toppings = toppings;
-        this.order = order;
+    public Order_Drink(
+            Order order,
+            Drink drink,
+            TemperatureAspect temperature,
+            Set<SweetenerAspect> sweeteners,
+            Drink_Size size,
+            List<String> toppings
+    ) throws IllegalAccessException {
+        this.order = Objects.requireNonNull(order);
+        this.drink = Objects.requireNonNull(drink);
+        this.temperature = Objects.requireNonNull(temperature);
+        this.size = Objects.requireNonNull(size);
+        this.toppings = new ArrayList<>(Objects.requireNonNull(toppings));
+        this.sweeteners = (sweeteners == null)
+                ? new HashSet<>()
+                : new HashSet<>(sweeteners);
 
-        try {
-            if (!validate(this)) throw new ValidationException("Invalid data");
-        } catch (IllegalAccessException | ValidationException e) {
-            throw new ValidationException(e.getMessage());
+        this.additionalCost = calculateCost();
+
+        if (!validate(this)) {
+            throw new ValidationException("Invalid Order_Drink");
         }
 
-        double cost = drink.basePrice;
-
-        switch (size) {
-            case MEDIUM: cost += 2; break;
-            case BIG: cost += 4; break;
-            case XXL: cost += 6; break;
-            default: cost += 0;
-        }
-
-        cost += toppings.size() * 1.0;
-
-        this.additionalCost = cost;
         order_Drinks.add(this);
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Order_Drink)) return false;
-        Order_Drink that = (Order_Drink) o;
-        return Objects.equals(heated, that.heated) &&
-                Objects.equals(cooled, that.cooled) &&
-                Objects.equals(size, that.size) &&
-                Objects.equals(drink, that.drink) &&
-                Objects.equals(additionalCost, that.additionalCost) &&
-                Objects.equals(toppings, that.toppings);
+    private double calculateCost() {
+        double cost = drink.basePrice;
+
+        cost += switch (size) {
+            case MEDIUM -> 2;
+            case BIG -> 4;
+            case XXL -> 6;
+            default -> 0;
+        };
+
+        cost += toppings.size();
+        cost += sweeteners.size() * 0.5;
+
+        return cost;
     }
 
-    public static Order_Drink find(Order order, Drink drink, boolean heated, boolean cooled,
-                                   Drink_Size size,  List<String> toppings) {
+    // === FIND (FIXED) ===
+    public static Order_Drink find(
+            Order order,
+            Drink drink,
+            TemperatureAspect temperature,
+            Set<SweetenerAspect> sweeteners,
+            Drink_Size size,
+            List<String> toppings
+    ) {
         for (Order_Drink od : order_Drinks) {
-            if(od.getOrder() == order) {
-                if(od.getDrink() == drink) {
-                    if(od.isHeated() == heated) {
-                        if(od.isCooled() == cooled) {
-                            if(od.getSize() == size) {
-                                if(od.getToppings() ==  toppings) {
-                                    return od;
-                                }
-                            }
-                        }
-                    }
-                }
+            if (Objects.equals(od.order, order) &&
+                    Objects.equals(od.drink, drink) &&
+                    Objects.equals(od.temperature, temperature) &&
+                    Objects.equals(od.size, size) &&
+                    Objects.equals(od.toppings, toppings) &&
+                    Objects.equals(od.sweeteners, sweeteners)) {
+                return od;
             }
         }
         return null;
     }
 
-    public boolean isHeated() {
-        return heated;
+    // === equality = full identity ===
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Order_Drink od)) return false;
+
+        return Objects.equals(order, od.order) &&
+                Objects.equals(drink, od.drink) &&
+                Objects.equals(temperature, od.temperature) &&
+                Objects.equals(size, od.size) &&
+                Objects.equals(toppings, od.toppings) &&
+                Objects.equals(sweeteners, od.sweeteners);
     }
 
-    public void setHeated(boolean heated) {
-        this.heated = heated;
-    }
-
-    public boolean isCooled() {
-        return cooled;
-    }
-
-    public void setCooled(boolean cooled) {
-        this.cooled = cooled;
-    }
-
-    public Drink_Size getSize() {
-        return size;
-    }
-
-    public void setSize(Drink_Size size) {
-        this.size = size;
+    @Override
+    public int hashCode() {
+        return Objects.hash(order, drink, temperature, size, toppings, sweeteners);
     }
 
     public Drink getDrink() {
         return drink;
     }
 
-    public void setDrink(Drink drink) {
-        this.drink = drink;
-    }
-
     public Order getOrder() {
         return order;
-    }
-
-    public void setOrder(Order order) {
-        this.order = order;
     }
 
     public List<String> getToppings() {
         return toppings;
     }
 
-    public void setToppings(List<String> toppings) {
-        this.toppings = toppings;
+    public double getAdditionalCost() {
+        return additionalCost;
     }
 }
