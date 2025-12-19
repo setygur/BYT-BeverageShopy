@@ -45,13 +45,17 @@ public class Facility implements Validatable {
 
         if (!shifts.contains(shift)) {
             shifts.add(shift);
-            shift.internalAddFacility(this);
+            if (!shift.getFacilities().contains(this)) {
+                shift.addFacility(this);
+            }
         }
     }
 
     public void removeShift(Shift shift) {
         if (shifts.remove(shift)) {
-            shift.internalRemoveFacility(this);
+            if (shift.getFacilities().contains(this)) {
+                shift.removeFacility(this);
+            }
         }
     }
 

@@ -47,15 +47,8 @@ public class Shift implements Validatable {
 
     // -------- Facility relation (1..*) --------
 
-    protected void internalAddFacility(Facility f) {
-        if (!facilities.contains(f)) facilities.add(f);
-    }
-
-    protected void internalRemoveFacility(Facility f) {
-        facilities.remove(f);
-    }
-
     public void addFacility(Facility facility) {
+        if (facility == null) return;
         if (!facilities.contains(facility)) {
             facilities.add(facility);
             facility.addShift(this);
@@ -63,6 +56,7 @@ public class Shift implements Validatable {
     }
 
     public void removeFacility(Facility facility) {
+        if (facility == null) return;
         if (facilities.remove(facility)) {
             facility.removeShift(this);
         }
@@ -80,15 +74,17 @@ public class Shift implements Validatable {
     // -------- Employee relation (0..*) --------
 
     public void addEmployee(Employee e) {
+        if (e == null) return;
         if (!employees.contains(e)) {
             employees.add(e);
-            e.internalAddShift(this);
+            e.addShift(this);
         }
     }
 
     public void removeEmployee(Employee e) {
+        if (e == null) return;
         if (employees.remove(e)) {
-            e.internalRemoveShift(this);
+            e.removeShift(this);
         }
     }
 
