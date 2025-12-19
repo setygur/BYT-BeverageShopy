@@ -355,6 +355,18 @@ public class Employee extends Person {
             shifts.add(shift);
         }
     }
+
+    public void removeShift(Shift shift) {
+        if (shift == null) throw new ValidationException("Invalid data");
+
+        if (shifts.contains(shift)) {
+            shifts.remove(shift);
+
+            // This assumes Shift has a method like removeEmployee(Employee e)
+            shift.removeEmployee(this);
+        }
+    }
+
     public List<Shift> getShifts() {
         return Collections.unmodifiableList(shifts);
     }

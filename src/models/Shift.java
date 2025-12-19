@@ -82,13 +82,13 @@ public class Shift implements Validatable {
     public void addEmployee(Employee e) {
         if (!employees.contains(e)) {
             employees.add(e);
-            e.internalAddShift(this);
+            e.addShift(this);
         }
     }
 
     public void removeEmployee(Employee e) {
         if (employees.remove(e)) {
-            e.internalRemoveShift(this);
+            e.removeShift(this);
         }
     }
 

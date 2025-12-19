@@ -43,7 +43,7 @@ public class Certification implements Validatable {
             throw new ValidationException(e.getMessage());
         }
 
-        this.employee.internalAddCertification(this);
+        this.employee.addCertification(this);
         certifications.add(this);
     }
 
