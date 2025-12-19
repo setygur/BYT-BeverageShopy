@@ -106,7 +106,7 @@ public abstract class Employee extends Person {
         return Collections.unmodifiableList(certifications);
     }
 
-    protected void internalAddCertification(Certification certification) {
+    protected void addCertification(Certification certification) {
         if (!certifications.contains(certification)) {
             certifications.add(certification);
         }
@@ -128,12 +128,24 @@ public abstract class Employee extends Person {
                 .toString();
     }
 
-    protected void internalAddShift(Shift shift) {
-        if (!shifts.contains(shift)) shifts.add(shift);
+    public void addShift(Shift shift) {
+        if (shift == null) throw new ValidationException("Invalid data");
+        if (!shifts.contains(shift)) {
+            shifts.add(shift);
+            if (!shift.getEmployees().contains(this)) {
+                shift.addEmployee(this);
+            }
+        }
     }
 
-    protected void internalRemoveShift(Shift shift) {
-        shifts.remove(shift);
+    public void removeShift(Shift shift) {
+        if (shift == null) throw new ValidationException("Invalid data");
+        if (shifts.contains(shift)) {
+            shifts.remove(shift);
+            if (shift.getEmployees().contains(this)) {
+                shift.removeEmployee(this);
+            }
+        }
     }
 
     public List<Shift> getShifts() {
