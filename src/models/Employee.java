@@ -403,4 +403,32 @@ public class Employee extends Person {
                 .add("Role: " + roleInfo)
                 .toString();
     }
+
+  public void addShift(Shift shift) {
+        if (shift == null) throw new ValidationException("Invalid data");
+        if (!shifts.contains(shift)) {
+            shifts.add(shift);
+            if (!shift.getEmployees().contains(this)) {
+                shift.addEmployee(this);
+            }
+        }
+    }
+
+    public void removeShift(Shift shift) {
+        if (shift == null) throw new ValidationException("Invalid data");
+        if (shifts.contains(shift)) {
+            shifts.remove(shift);
+            if (shift.getEmployees().contains(this)) {
+                shift.removeEmployee(this);
+            }
+        }
+    }
+
+    public List<Shift> getShifts() {
+        return Collections.unmodifiableList(shifts);
+    }
+
+    public static void setBaseSalary(double baseSalary) {
+        Employee.baseSalary = baseSalary;
+    }
 }

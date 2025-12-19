@@ -1,10 +1,13 @@
 package models;
 
+import models.aspects.SweetenerAspect;
+import models.aspects.TemperatureAspect;
 import models.utils.Drink_Size;
 import persistence.JsonCtor;
 import persistence.JsonSerializable;
 import persistence.ObjectList;
 import validation.*;
+
 import java.util.*;
 
 @JsonSerializable
@@ -14,45 +17,37 @@ public class Drink implements Validatable {
 
     @NotBlank
     private String name;
+
     @NotNull
     @Range(min = 0)
     public double basePrice;
+
     @NotBlank
     private String persistentAllergens;
-    private List<Order_Drink> orders = new ArrayList<>();
 
-    //Drink types
+    private final List<Order_Drink> orders = new ArrayList<>();
+
+    // Drink types (overlapping, complete assumed)
     private Coffee coffee;
     private Tea tea;
     private Milk milk;
     private Fruit fruit;
 
+    // Deliveries 0..*
+    private final List<Delivery> deliveries = new ArrayList<>();
 
-    //Deliveries 0..* connection
-    private List <Delivery> deliveries = new ArrayList<>();
-
-    public void addDelivery(Delivery delivery) {
-        if (delivery != null && !deliveries.contains(delivery)) {
-            deliveries.add(delivery);
-            delivery.addDrink(this); // sync inverse
-        }
-    }
-
-    public void removeDelivery(Delivery delivery) {
-        if (delivery != null && deliveries.contains(delivery)) {
-            deliveries.remove(delivery);
-            delivery.removeDrink(this); // sync inverse
-        }
-    }
-
-    public List<Delivery> getDeliveries() {
-        return deliveries;
-    }
-
+    // ---------------- Constructor ----------------
 
     @JsonCtor
-    public Drink(String name, double basePrice, String persistentAllergens, Coffee coffee, Tea tea,
-                 Milk milk, Fruit fruit) {
+    public Drink(
+            String name,
+            double basePrice,
+            String persistentAllergens,
+            Coffee coffee,
+            Tea tea,
+            Milk milk,
+            Fruit fruit
+    ) {
         this.name = name;
         this.basePrice = basePrice;
         this.persistentAllergens = persistentAllergens;
@@ -66,55 +61,125 @@ public class Drink implements Validatable {
         } catch (IllegalAccessException | ValidationException e) {
             throw new ValidationException(e.getMessage());
         }
+
         drinks.add(this);
     }
 
-    public void addOrder(Order order, boolean heated, boolean cooled,
-                         Drink_Size size, List<String> toppings){
+    // ---------------- Orders (association class) ----------------
+
+    public void addOrder(
+            Order order,
+            TemperatureAspect temperature,
+            Set<SweetenerAspect> sweeteners,
+            Drink_Size size,
+            List<String> toppings
+    ) {
         if (order == null) throw new ValidationException("Invalid data");
-        if (toppings == null) throw new ValidationException("Invalid data");
+        if (temperature == null) throw new ValidationException("Invalid data");
         if (size == null) throw new ValidationException("Invalid data");
-        Order_Drink od = Order_Drink.find(order, this, heated, cooled, size, toppings);
-        if(od == null) {
-            od = new Order_Drink(order, this, heated, cooled, size, toppings);
+        if (toppings == null) throw new ValidationException("Invalid data");
+
+        Set<SweetenerAspect> safeSweeteners =
+                (sweeteners == null) ? Collections.emptySet() : new HashSet<>(sweeteners);
+
+        List<String> safeToppings = new ArrayList<>(toppings);
+
+        Order_Drink od = Order_Drink.find(
+                order,
+                this,
+                temperature,
+                safeSweeteners,
+                size,
+                safeToppings
+        );
+
+        if (od == null) {
+            od = new Order_Drink(
+                    order,
+                    this,
+                    temperature,
+                    safeSweeteners,
+                    size,
+                    safeToppings
+            );
         }
-        orders.add(od);
-        order.addDrink(od);
+
+        addOrder(od);
     }
 
-    public void addOrder(Order_Drink od){
-        if(od == null) throw new ValidationException("Invalid data");
-        if(orders.contains(od)) return;
+    public void addOrder(Order_Drink od) {
+        if (od == null) throw new ValidationException("Invalid data");
+        if (orders.contains(od)) return;
+
         orders.add(od);
-        od.getOrder().addDrink(od);
+        od.getOrder().addDrink(od); // sync inverse
     }
 
-    public void removeOrder(Order order, boolean heated, boolean cooled, Drink_Size size, List<String> toppings) {
-        for (Order_Drink o : orders) {
-            if(o.equals(new Order_Drink(order, this, heated, cooled, size, toppings))){
-                if(orders.contains(o)){
-                    orders.remove(o);
-                    order.removeDrink(o);
-                    return;
-                }
-                return;
-            }
+    public void removeOrder(
+            Order order,
+            TemperatureAspect temperature,
+            Set<SweetenerAspect> sweeteners,
+            Drink_Size size,
+            List<String> toppings
+    ) {
+        if (order == null) throw new ValidationException("Invalid data");
+        if (temperature == null) throw new ValidationException("Invalid data");
+        if (size == null) throw new ValidationException("Invalid data");
+        if (toppings == null) throw new ValidationException("Invalid data");
+
+        Set<SweetenerAspect> safeSweeteners =
+                (sweeteners == null) ? Collections.emptySet() : new HashSet<>(sweeteners);
+
+        Order_Drink od = Order_Drink.find(
+                order,
+                this,
+                temperature,
+                safeSweeteners,
+                size,
+                toppings
+        );
+
+        if (od != null) {
+            removeOrder(od);
         }
     }
 
     public void removeOrder(Order_Drink od) {
         if (od == null) throw new ValidationException("Invalid data");
+        if (!orders.contains(od)) return;
+
         orders.remove(od);
-        od.getOrder().removeDrink(od);
+        od.getOrder().removeDrink(od); // sync inverse
     }
 
-    public void setOrder(Order_Drink od, Order_Drink nod) {
-        if (od == null) throw new ValidationException("Invalid data");
-        if (nod == null) throw new ValidationException("Invalid data");
-        if(orders.contains(od)){
-            orders.remove(od);
-            orders.add(nod);
-            od.getOrder().setDrink(od, nod);
+    public void setOrder(Order_Drink oldOd, Order_Drink newOd) {
+        if (oldOd == null) throw new ValidationException("Invalid data");
+        if (newOd == null) throw new ValidationException("Invalid data");
+        if (!orders.contains(oldOd)) return;
+
+        orders.remove(oldOd);
+        orders.add(newOd);
+
+        oldOd.getOrder().setDrink(oldOd, newOd); // sync inverse
+    }
+
+    // ---------------- Deliveries ----------------
+
+    public void addDelivery(Delivery delivery) {
+        if (delivery != null && !deliveries.contains(delivery)) {
+            deliveries.add(delivery);
+            delivery.addDrink(this);
         }
+    }
+
+    public void removeDelivery(Delivery delivery) {
+        if (delivery != null && deliveries.contains(delivery)) {
+            deliveries.remove(delivery);
+            delivery.removeDrink(this);
+        }
+    }
+
+    public List<Delivery> getDeliveries() {
+        return Collections.unmodifiableList(deliveries);
     }
 }

@@ -1,6 +1,7 @@
 package modelsTests;
 
 import models.*;
+import models.aspects.*;
 import models.utils.Drink_Size;
 import models.utils.OrderQualifier;
 import modelsTests.utilTests.TestUtils;
@@ -9,8 +10,7 @@ import org.junit.jupiter.api.Test;
 import validation.ValidationException;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -52,11 +52,32 @@ public class OrderTests {
                 () -> new Order(10L, t.minusMinutes(1), 0));
     }
 
+    // ---------- total price ----------
+
     @Test
-    void getTotalPrice_includesTip() {
+    void getTotalPrice_emptyOrder_isTipOnly() {
         Order o = new Order(1L, LocalDateTime.now(), 3.5);
-        assertEquals(11.5, o.getTotalPrice(), 0.0001);
+        assertEquals(3.5, o.getTotalPrice(), 0.0001);
     }
+
+    @Test
+    void getTotalPrice_sumsDrinksAndTip() {
+        Order o = new Order(1L, LocalDateTime.now(), 2.0);
+        Drink d = new Drink("D", 10.0, "none", null, null, null, null);
+
+        o.addDrink(
+                d,
+                new HotDrink(),
+                Set.of(new HoneySweetened()),
+                Drink_Size.BIG,
+                List.of("a", "b")
+        );
+
+        // base 10 + size 4 + toppings 2 + sweetener 0.5 + tip 2
+        assertEquals(18.5, o.getTotalPrice(), 0.0001);
+    }
+
+    // ---------- shop association ----------
 
     @Test
     void addShop_throws_whenNull() {
@@ -95,7 +116,7 @@ public class OrderTests {
         Order o = new Order(1L, LocalDateTime.now(), 0.0);
         Shop s = new Shop(LocalDateTime.now());
 
-        setShopDirect(o, s);
+        assertDoesNotThrow(() -> o.addShop(s));
 
         // Assuming removeShop handles consistency checks, strict validation might fail if link is partial,
         // but typically we test that it cleans up.
@@ -105,6 +126,8 @@ public class OrderTests {
 
         assertNull(TestUtils.getField(o, "shop", Shop.class));
     }
+
+    // ---------- cashier association ----------
 
     @Test
     void addCashier_throws_whenNull() {
@@ -125,7 +148,7 @@ public class OrderTests {
         Order o = new Order(1L, LocalDateTime.now(), 0.0);
         Employee c = createCashier("1");
 
-        assertDoesNotThrow(() -> o.addCashier(c));
+        o.addCashier(c);
 
         assertSame(c, TestUtils.getField(o, "cashier", Employee.class));
 
@@ -134,12 +157,12 @@ public class OrderTests {
     }
 
     @Test
-    void removeCashier_unlinksBidirectionally_whenMatchesCurrentCashier() {
+    void removeCashier_unlinksBidirectionally() {
         Order o = new Order(1L, LocalDateTime.now(), 0.0);
         Employee c = createCashier("1");
 
         o.addCashier(c);
-        assertDoesNotThrow(() -> o.removeCashier(c));
+        o.removeCashier(c);
 
         assertNull(TestUtils.getField(o, "cashier", Employee.class));
 
@@ -147,16 +170,20 @@ public class OrderTests {
         assertFalse(cashierOrders.contains(o));
     }
 
+    // ---------- drinks ----------
+
     @Test
-    void addDrink_overloadWithOrderDrink_addsAndBackLinks_whenOrderIsSet() {
+    void addDrink_addsAndBackLinks_correctly() {
         Order o = new Order(1L, LocalDateTime.now(), 0.0);
         Drink d = new Drink("D", 5.0, "none", null, null, null, null);
 
-        Order_Drink od = new Order_Drink(o, d, true, false, Drink_Size.MEDIUM, new ArrayList<>());
-        od.setOrder(o);
-        od.setDrink(d);
-
-        assertDoesNotThrow(() -> o.addDrink(od));
+        o.addDrink(
+                d,
+                new ColdDrink(),
+                Set.of(),
+                Drink_Size.MEDIUM,
+                List.of()
+        );
 
         List<Order_Drink> orderDrinks = TestUtils.getField(o, "drinks", List.class);
         List<Order_Drink> drinkOrders = TestUtils.getField(d, "orders", List.class);
