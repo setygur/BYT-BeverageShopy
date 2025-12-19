@@ -1,8 +1,9 @@
 package models;
 
+import models.aspects.SweetenerAspect;
+import models.aspects.TemperatureAspect;
 import models.utils.Drink_Size;
 import persistence.JsonCtor;
-import persistence.JsonIgnore;
 import persistence.JsonSerializable;
 import persistence.ObjectList;
 import validation.*;
@@ -18,11 +19,15 @@ public class Order implements Validatable {
     @NotNull
     @Unique
     private long orderId;
+
     @NotBlank
     @NotFuture
     private LocalDateTime timeOfOrder;
+
     private double tip;
-    private List<Order_Drink> drinks = new ArrayList<>();
+
+    private final List<Order_Drink> drinks = new ArrayList<>();
+
     private Cashier cashier;
     private Shop shop;
 
@@ -39,6 +44,8 @@ public class Order implements Validatable {
         }
         orders.add(this);
     }
+
+    // ---------------- Associations: Shop ----------------
 
     public void addShop(Shop shop) {
         if (shop == null) throw new ValidationException("Invalid data");
@@ -65,6 +72,8 @@ public class Order implements Validatable {
         }
     }
 
+    // ---------------- Associations: Cashier ----------------
+
     public void addCashier(Cashier cashier) {
         if (cashier == null) throw new ValidationException("Invalid data");
         if (this.cashier == cashier) return;
@@ -80,7 +89,7 @@ public class Order implements Validatable {
         }
     }
 
-    public void setCashier(Cashier oldCashier,  Cashier newCashier) {
+    public void setCashier(Cashier oldCashier, Cashier newCashier) {
         if (oldCashier == null) throw new ValidationException("Invalid data");
         if (newCashier == null) throw new ValidationException("Invalid data");
         if (this.cashier == oldCashier) {
@@ -90,60 +99,97 @@ public class Order implements Validatable {
         }
     }
 
-    public double getTotalPrice() {
-        // Mocked: sum of drink base cost + size cost + toppings cost
-        double baseCost = 5.0;
-        double sizeCost = 1.0;
-        double toppingsCost = 2.0;
-        return baseCost + sizeCost + toppingsCost + tip;
-    }
+    // ---------------- Drinks (Association Class) ----------------
 
-    public void addDrink(Drink drink, boolean heated, boolean cooled, Drink_Size size, List<String> toppings) {
+    public void addDrink(
+            Drink drink,
+            TemperatureAspect temperature,
+            Set<SweetenerAspect> sweeteners,
+            Drink_Size size,
+            List<String> toppings
+    ) {
         if (drink == null) throw new ValidationException("Invalid data");
-        if (toppings == null) throw new ValidationException("Invalid data");
+        if (temperature == null) throw new ValidationException("Invalid data");
         if (size == null) throw new ValidationException("Invalid data");
-        Order_Drink od = Order_Drink.find(this, drink, heated, cooled, size, toppings);
-        if(od == null) {
-            od = new Order_Drink(this, drink, heated, cooled, size, toppings);
+        if (toppings == null) throw new ValidationException("Invalid data");
+
+        Set<SweetenerAspect> safeSweeteners =
+                (sweeteners == null) ? Collections.emptySet() : new HashSet<>(sweeteners);
+
+        List<String> safeToppings = new ArrayList<>(toppings);
+
+        Order_Drink od = Order_Drink.find(this, drink, temperature, safeSweeteners, size, safeToppings);
+        if (od == null) {
+            od = new Order_Drink(this, drink, temperature, safeSweeteners, size, safeToppings);
         }
-        drinks.add(od);
-        drink.addOrder(od);
+
+        addDrink(od); // keep inverse consistent
     }
 
     public void addDrink(Order_Drink od) {
         if (od == null) throw new ValidationException("Invalid data");
-        if(this.drinks.contains(od)) return;
+        if (od.getOrder() != this) throw new ValidationException("Order_Drink belongs to a different Order");
+        if (this.drinks.contains(od)) return;
+
         this.drinks.add(od);
-        od.getDrink().addOrder(od);
+        od.getDrink().addOrder(od); // sync inverse
     }
 
-    public void removeDrink(Drink drink, boolean heated, boolean cooled, Drink_Size size, List<String> toppings) {
-        for (Order_Drink o : drinks) {
-            if(o.equals(new Order_Drink(this, drink, heated, cooled, size, toppings))){
-                if(drinks.contains(o)){
-                    drinks.remove(o);
-                    drink.removeOrder(o);
-                    return;
-                }
-                return;
-            }
+    public void removeDrink(
+            Drink drink,
+            TemperatureAspect temperature,
+            Set<SweetenerAspect> sweeteners,
+            Drink_Size size,
+            List<String> toppings
+    ) {
+        if (drink == null) throw new ValidationException("Invalid data");
+        if (temperature == null) throw new ValidationException("Invalid data");
+        if (size == null) throw new ValidationException("Invalid data");
+        if (toppings == null) throw new ValidationException("Invalid data");
+
+        Set<SweetenerAspect> safeSweeteners =
+                (sweeteners == null) ? Collections.emptySet() : new HashSet<>(sweeteners);
+
+        Order_Drink od = Order_Drink.find(this, drink, temperature, safeSweeteners, size, toppings);
+        if (od != null) {
+            removeDrink(od);
         }
     }
 
     public void removeDrink(Order_Drink od) {
         if (od == null) throw new ValidationException("Invalid data");
-        if(!this.drinks.contains(od)) return;
-        drinks.remove(od);
-        od.getDrink().removeOrder(od);
+        if (!this.drinks.contains(od)) return;
+
+        this.drinks.remove(od);
+        od.getDrink().removeOrder(od); // sync inverse
     }
 
-    public void setDrink(Order_Drink od, Order_Drink nod) {
-        if (od == null) throw new ValidationException("Invalid data");
-        if (nod == null) throw new ValidationException("Invalid data");
-        if(drinks.contains(od)){
-            drinks.remove(od);
-            drinks.add(nod);
-            od.getDrink().setOrder(od, nod);
-        }
+    public void setDrink(Order_Drink oldOd, Order_Drink newOd) {
+        if (oldOd == null) throw new ValidationException("Invalid data");
+        if (newOd == null) throw new ValidationException("Invalid data");
+        if (!this.drinks.contains(oldOd)) return;
+        if (newOd.getOrder() != this) throw new ValidationException("New Order_Drink belongs to a different Order");
+
+        this.drinks.remove(oldOd);
+        this.drinks.add(newOd);
+
+        oldOd.getDrink().setOrder(oldOd, newOd); // sync inverse
     }
+
+    // ---------------- Total price ----------------
+
+    public double getTotalPrice() {
+        double sum = 0.0;
+        for (Order_Drink od : drinks) {
+            sum += od.getAdditionalCost(); // uses derived cost from Order_Drink
+        }
+        return sum + tip;
+    }
+
+    // ---------------- getters (needed by Order_Drink.find) ----------------
+
+    public long getOrderId() { return orderId; }
+    public LocalDateTime getTimeOfOrder() { return timeOfOrder; }
+    public double getTip() { return tip; }
+    public List<Order_Drink> getDrinks() { return Collections.unmodifiableList(drinks); }
 }
