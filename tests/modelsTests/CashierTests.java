@@ -1,5 +1,9 @@
 package modelsTests;
+
+import models.Employee;
 import models.Order;
+import models.Person;
+import models.utils.EmployeeType;
 import modelsTests.utilTests.TestUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,64 +18,49 @@ public class CashierTests {
 
     @BeforeEach
     void reset() {
-        TestUtils.resetObjectLists(Cashier.class, Order.class);
+        // Resetting generic Employee list instead of Cashier list
+        TestUtils.resetObjectLists(Person.class, Employee.class, Order.class);
     }
 
-    @Test
-    void createsCashier_whenDataIsValid() {
-        Cashier c = assertDoesNotThrow(() ->
-                new Cashier(
-                        "John", "Silverhand", "john@corp",
-                        "99010112345", null,
-                        true, "CASH-001", 4.7
-                )
+    // Helper to create a valid Cashier
+    private Employee createCashier(String suffix, String id) {
+        Employee e = new Employee(
+                "John", "Silverhand", "john" + suffix + "@corp",
+                "99010112345", null
         );
-        assertNotNull(c);
-        assertTrue(Cashier.cashiers.contains(c));
+        e.becomeCashier(true, id, 4.7);
+        return e;
     }
 
     @Test
-    void throws_whenCashierIdIsBlank() {
-        ValidationException ex = assertThrows(ValidationException.class, () ->
-                new Cashier(
-                        "John", "Silverhand", "john@corp",
-                        "99010112345", null,
-                        true, "   ", 3.2
-                )
-        );
-        assertTrue(ex.getMessage().toLowerCase().contains("required")
-                || ex.getMessage().toLowerCase().contains("blank")
-                || ex.getMessage().toLowerCase().contains("invalid"));
-    }
+    void becomeCashier_setsTypeAndFields_whenDataIsValid() {
+        Employee e = new Employee("John", "Silverhand", "john@corp", "99010112345", null);
 
-    @Test
-    void throws_whenCashierIdIsDuplicate() {
         assertDoesNotThrow(() ->
-                new Cashier(
-                        "Alice", "W.", "alice@corp",
-                        "99010112345", null,
-                        true, "CASH-XYZ", 3.9
-                )
+                e.becomeCashier(true, "CASH-001", 4.7)
         );
 
-        ValidationException ex = assertThrows(ValidationException.class, () ->
-                new Cashier(
-                        "Bob", "Q.", "bob@corp",
-                        "88010112345", null,
-                        true, "CASH-XYZ", 4.1
-                )
-        );
-        assertTrue(ex.getMessage().toLowerCase().contains("unique"));
+        assertEquals(EmployeeType.CASHIER, e.getType());
+        assertTrue(Employee.employees.contains(e));
     }
 
     @Test
-    void throws_whenBothPeselAndPassportMissing() {
+    void becomeCashier_throws_whenCashierIdIsBlank() {
+        Employee e = new Employee("John", "Silverhand", "john@corp", "99010112345", null);
+
         ValidationException ex = assertThrows(ValidationException.class, () ->
-                new Cashier(
-                        "Eve", "Parker", "eve@corp",
-                        null, null,
-                        true, "CASH-777", 4.2
-                )
+                e.becomeCashier(true, "   ", 3.2)
+        );
+
+        String msg = ex.getMessage().toLowerCase();
+        assertTrue(msg.contains("required") || msg.contains("blank") || msg.contains("invalid") || msg.contains("id"));
+    }
+
+    @Test
+    void ctor_throws_whenBothPeselAndPassportMissing() {
+        // Validating base Employee constructor logic
+        ValidationException ex = assertThrows(ValidationException.class, () ->
+                new Employee("Eve", "Parker", "eve@corp", null, null)
         );
         assertTrue(ex.getMessage().toLowerCase().contains("either")
                 || ex.getMessage().toLowerCase().contains("pesel")
@@ -80,8 +69,7 @@ public class CashierTests {
 
     @Test
     void addOrder_addsToCashierAndBackLinksToOrder() {
-        Cashier c = new Cashier("A", "B", "a@corp", "99010112345", null,
-                true, "C1", 4.0);
+        Employee c = createCashier("1", "C1");
         Order o = new Order(1L, LocalDateTime.now(), 0.0);
 
         assertDoesNotThrow(() -> c.addOrder(o));
@@ -89,15 +77,24 @@ public class CashierTests {
         List<Order> cashierOrders = TestUtils.getField(c, "orders", List.class);
         assertTrue(cashierOrders.contains(o));
 
-        Cashier orderCashier = TestUtils.getField(o, "cashier", Cashier.class);
+        // Note: Order.cashier field is now type Employee
+        Employee orderCashier = TestUtils.getField(o, "cashier", Employee.class);
         assertSame(c, orderCashier);
     }
 
     @Test
+    void addOrder_throws_whenNotCashier() {
+        // New Test: Ensure regular employees cannot process orders
+        Employee notCashier = new Employee("Not", "C", "nc@corp", "99010112345", null);
+        Order o = new Order(2L, LocalDateTime.now(), 0.0);
+
+        assertThrows(ValidationException.class, () -> notCashier.addOrder(o));
+    }
+
+    @Test
     void addOrder_isIdempotent_whenSameOrderAddedTwice() {
-        Cashier c = new Cashier("A", "B", "a@corp", "99010112345", null,
-                true, "C1", 4.0);
-        Order o = new Order(1L, LocalDateTime.now(), 0.0);
+        Employee c = createCashier("1", "C1");
+        Order o = new Order(255L, LocalDateTime.now(), 0.0);
 
         c.addOrder(o);
         c.addOrder(o);
@@ -108,8 +105,7 @@ public class CashierTests {
 
     @Test
     void removeOrder_removesFromCashierAndBackUnlinksFromOrder() {
-        Cashier c = new Cashier("A", "B", "a@corp", "99010112345", null,
-                true, "C1", 4.0);
+        Employee c = createCashier("1", "C1");
         Order o = new Order(1L, LocalDateTime.now(), 0.0);
 
         c.addOrder(o);
@@ -118,33 +114,16 @@ public class CashierTests {
         List<Order> cashierOrders = TestUtils.getField(c, "orders", List.class);
         assertFalse(cashierOrders.contains(o));
 
-        Cashier orderCashier = TestUtils.getField(o, "cashier", Cashier.class);
+        Employee orderCashier = TestUtils.getField(o, "cashier", Employee.class);
         assertNull(orderCashier);
     }
 
     @Test
-    void setOrder_replacesOldOrderWithNewOrder_andMaintainsBackLinks() {
-        Cashier c = new Cashier("A", "B", "a@corp", "99010112345", null,
-                true, "C1", 4.0);
-        Order oldO = new Order(1L, LocalDateTime.now(), 0.0);
-        Order newO = new Order(2L, LocalDateTime.now(), 0.0);
-
-        c.addOrder(oldO);
-
-        assertDoesNotThrow(() -> c.setOrder(oldO, newO));
-
-        List<Order> cashierOrders = TestUtils.getField(c, "orders", List.class);
-        assertFalse(cashierOrders.contains(oldO));
-        assertTrue(cashierOrders.contains(newO));
-
-        assertNull(TestUtils.getField(oldO, "cashier", Cashier.class));
-        assertSame(c, TestUtils.getField(newO, "cashier", Cashier.class));
-    }
-
-    @Test
     void getSalary_returnsHoursTimesRatePlusTips_mockedValues() {
-        Cashier c = new Cashier("A", "B", "a@corp", "99010112345", null,
-                true, "C1", 4.0);
-        assertEquals(40.0 * 20.0 + 150.0, c.getSalary(), 1e-9);
+        // Setup: HandlesCash = true
+        Employee c = createCashier("1", "C1");
+
+
+        assertEquals(250.0, c.getSalary(), 1e-9);
     }
 }

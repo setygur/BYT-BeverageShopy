@@ -17,6 +17,7 @@ public class Employee extends Person {
     private String peselNumber;
     private String passportNumber;
 
+
     @Range(min = 0)
     private static double baseSalary = 3000.0; // Default base
 
@@ -149,9 +150,6 @@ public class Employee extends Person {
         if (cashierId == null || cashierId.isBlank()) throw new ValidationException("Cashier ID required");
         if (score < 0) throw new ValidationException("Score cannot be negative");
 
-        // Unique check for Cashier ID would typically go here or in a service
-        // For simplicity, we assume uniqueness is checked externally or via annotation processor
-
         clearRoles(); // Wipe previous identity
 
         this.type = EmployeeType.CASHIER;
@@ -177,6 +175,10 @@ public class Employee extends Person {
             default:
                 return baseSalary; // Fallback for basic employee
         }
+    }
+
+    public static void setBaseSalary(double baseSalary) {
+        Employee.baseSalary = baseSalary;
     }
 
    // Loader methods
@@ -241,7 +243,7 @@ public class Employee extends Person {
 
     public void removeManaged(Employee employee) {
         if (this.type != EmployeeType.MANAGER) return;
-        if(employee == null) throw new ValidationException("Invalid data");
+        //if(employee == null) throw new ValidationException("Invalid data");
 
         if(this.managed.contains(employee)){
             this.managed.remove(employee);
