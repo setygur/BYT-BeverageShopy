@@ -2,6 +2,7 @@ package modelsTests;
 
 import models.*;
 import models.utils.OrderQualifier;
+import models.utils.EmployeeType;
 import modelsTests.utilTests.TestUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,15 +17,18 @@ public class ShopTests {
 
     @BeforeEach
     void reset() {
-        TestUtils.resetObjectLists(Shop.class, Order.class, Cashier.class, OrderQualifier.class);
+        // Updated: Reset Employee list instead of Cashier list
+        TestUtils.resetObjectLists(Shop.class, Order.class, Employee.class, OrderQualifier.class);
     }
 
-    private Cashier cashier(String suffix) {
-        return new Cashier(
+    // Helper to create an Employee acting as a Cashier
+    private Employee createCashier(String suffix) {
+        Employee e = new Employee(
                 "John", "Doe", "john" + suffix + "@corp",
-                "99010112345", null,
-                true, "CASH-" + suffix, 4.0
+                "99010112345", null
         );
+        e.becomeCashier(true, "CASH-" + suffix, 4.0);
+        return e;
     }
 
     @Test
@@ -63,7 +67,7 @@ public class ShopTests {
     @Test
     void addOrder_throws_whenAnyArgumentNull() {
         Shop s = new Shop(LocalDateTime.now());
-        Cashier c = cashier("01");
+        Employee c = createCashier("01");
         Order o = new Order(1L, LocalDateTime.now(), 0.0);
 
         assertThrows(ValidationException.class, () -> s.addOrder(null, c, o));
@@ -72,9 +76,22 @@ public class ShopTests {
     }
 
     @Test
+    void addOrder_throws_whenActorIsNotCashier() {
+        // New Test: Ensure we can't pass a regular Employee (or Manager/Loader) as a Cashier
+        Shop s = new Shop(LocalDateTime.now());
+        Employee notCashier = new Employee("Not", "C", "nc@c", "99010112345", null);
+        Order o = new Order(1L, LocalDateTime.now(), 0.0);
+
+        // Should throw because EmployeeType is NONE (or unrelated)
+        assertThrows(ValidationException.class, () ->
+                s.addOrder(LocalDateTime.now(), notCashier, o)
+        );
+    }
+
+    @Test
     void removeOrder_throws_whenAnyArgumentNull() {
         Shop s = new Shop(LocalDateTime.now());
-        Cashier c = cashier("02");
+        Employee c = createCashier("02");
         Order o = new Order(1L, LocalDateTime.now(), 0.0);
 
         assertThrows(ValidationException.class, () -> s.removeOrder(null, c, o));
@@ -85,8 +102,9 @@ public class ShopTests {
     @Test
     void setOrder_throws_whenAnyArgumentNull() {
         Shop s = new Shop(LocalDateTime.now());
-        Cashier c = cashier("03");
+        Employee c = createCashier("03");
 
+        // Assuming OrderQualifier constructor now accepts (LocalDateTime, Employee)
         OrderQualifier oq1 = new OrderQualifier(LocalDateTime.now(), c);
         OrderQualifier oq2 = new OrderQualifier(LocalDateTime.now().plusMinutes(1), c);
 
@@ -100,19 +118,25 @@ public class ShopTests {
     }
 
     @Test
-    void addOrder_currentlyCausesStackOverflow_dueToMutualRecursion_ShopAddOrder_OrderAddShop() {
+    void addOrder_handlesRecursion_correctly() {
+        // Previously: "currentlyCausesStackOverflow"
+        // Now: Should pass without error if guards are implemented correctly
         Shop s = new Shop(LocalDateTime.now());
-        Cashier c = cashier("04");
+        Employee c = createCashier("52");
         LocalDateTime t = LocalDateTime.now();
         Order o = new Order(1L, t, 0.0);
 
-        assertThrows(StackOverflowError.class, () -> s.addOrder(t, c, o));
+        assertDoesNotThrow(() -> s.addOrder(t, c, o));
+
+        // Verify association exists
+        OrderQualifier key = new OrderQualifier(t, c);
+        assertSame(o, s.getOrder(t, c));
     }
 
     @Test
     void getOrder_returnsMappedOrder_whenInsertedDirectlyIntoOrdersMap() {
         Shop s = new Shop(LocalDateTime.now());
-        Cashier c = cashier("05");
+        Employee c = createCashier("05");
         LocalDateTime t = LocalDateTime.now();
         Order o = new Order(1L, t, 0.0);
 

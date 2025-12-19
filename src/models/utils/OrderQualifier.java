@@ -1,6 +1,6 @@
 package models.utils;
 
-import models.Cashier;
+import models.Employee;
 import persistence.JsonCtor;
 import persistence.ObjectList;
 import validation.NotNull;
@@ -19,11 +19,14 @@ public class OrderQualifier implements Validatable {
     @NotNull
     private LocalDateTime timeOfOrder;
     @NotNull
-    private Cashier cashier;
+    private Employee cashier;
 
     @JsonCtor
-    public OrderQualifier(LocalDateTime timeOfOrder, Cashier cashier) {
+    public OrderQualifier(LocalDateTime timeOfOrder, Employee cashier) {
         this.timeOfOrder = timeOfOrder;
+        if(cashier.getType() != EmployeeType.CASHIER){
+            throw new ValidationException("cashier type must be CASHIER");
+        }
         this.cashier = cashier;
         try {
             if (!validate(this)) throw new ValidationException("Invalid data");
@@ -42,7 +45,7 @@ public class OrderQualifier implements Validatable {
                 Objects.equals(cashier, that.cashier);
     }
 
-    public static OrderQualifier find(LocalDateTime time, Cashier cashier) {
+    public static OrderQualifier find(LocalDateTime time, Employee cashier) {
         for (OrderQualifier orderQualifier : orderQualifiers) {
             if(orderQualifier.timeOfOrder.equals(time) &&  orderQualifier.cashier.equals(cashier)) {
                 return orderQualifier;
@@ -51,7 +54,7 @@ public class OrderQualifier implements Validatable {
         return null;
     }
 
-    public Cashier getCashier() {
+    public Employee getCashier() {
         return cashier;
     }
 

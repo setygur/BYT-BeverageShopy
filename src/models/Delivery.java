@@ -1,5 +1,6 @@
 package models;
 
+import models.utils.EmployeeType;
 import models.utils.Status;
 import persistence.JsonCtor;
 import persistence.JsonSerializable;
@@ -30,7 +31,7 @@ public class Delivery implements Validatable {
     @NotNull
     private Status status;
 
-    private List<Loader> loaders = new ArrayList<>();
+    private List<Employee> loaders = new ArrayList<>();
 
     // The warehouse this delivery was taken from (0..1)
     private Warehouse sourceWarehouse;
@@ -101,8 +102,14 @@ public class Delivery implements Validatable {
         return status;
     }
 
-    public boolean addLoader(Loader loader) {
+    public boolean addLoader(Employee loader) {
         if(loader ==  null) throw new ValidationException("Invalid data");
+
+        //Check if employee is Loader
+        if(loader.getType() != EmployeeType.LOADER) {
+            throw new ValidationException("Employee is not a loader");
+        }
+
         if(loaders.contains(loader)) return true;
         if(loaders.size() >=3) throw new ValidationException("Too many loaders");
         loaders.add(loader);
@@ -110,14 +117,14 @@ public class Delivery implements Validatable {
         return true;
     }
 
-    public void removeLoader(Loader loader) {
+    public void removeLoader(Employee loader) {
         if(loader ==  null) throw new ValidationException("Invalid data");
         if(!loaders.contains(loader)) return;
         loaders.remove(loader);
         loader.removeDelivery(this);
     }
 
-    public void setLoader(Loader oldLoader, Loader newLoader) {
+    public void setLoader(Employee oldLoader, Employee newLoader) {
         if(oldLoader ==  null) throw new ValidationException("Invalid data");
         if(newLoader ==  null) throw new ValidationException("Invalid data");
         if(loaders.contains(oldLoader)) {
@@ -129,7 +136,7 @@ public class Delivery implements Validatable {
         }
     }
 
-    public List<Loader> getLoaders() {
+    public List<Employee> getLoaders() {
         return Collections.unmodifiableList(loaders);
     }
 }

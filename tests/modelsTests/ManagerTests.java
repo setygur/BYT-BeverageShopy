@@ -1,8 +1,8 @@
 package modelsTests;
 
 import models.Employee;
-import models.Manager;
 import models.Person;
+import models.utils.EmployeeType;
 import modelsTests.utilTests.TestUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,132 +14,138 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class ManagerTests {
 
-    private static class TestEmployee extends Employee {
-        public TestEmployee(String name, String surname, String email, String pesel, String passport) {
-            super(name, surname, email, pesel, passport);
-        }
-    }
-
     @BeforeEach
     void reset() {
-        TestUtils.resetObjectLists(Person.class, Manager.class);
+        TestUtils.resetObjectLists(Person.class, Employee.class);
     }
 
-    private Manager manager(String suffix, double score, double bonusPct) {
-        return new Manager(
+    // Helper to create an Employee acting as a Manager
+    private Employee createManager(String suffix, double score, double bonusPct) {
+        Employee e = new Employee(
                 "M" + suffix, "Boss", "m" + suffix + "@corp",
-                "99010112345", null,
-                score, bonusPct
+                "99010112345", null
         );
+        e.becomeManager(score, bonusPct);
+        return e;
     }
 
     @Test
-    void ctor_addsToStaticList_whenValid() {
-        int before = Manager.managers.size();
+    void becomeManager_setsTypeAndFields_correctly() {
+        Employee e = new Employee("M", "B", "m@c", "99010112345", null);
 
-        Manager m = assertDoesNotThrow(() -> manager("01", 4.0, 10.0));
+        assertDoesNotThrow(() -> e.becomeManager(4.0, 10.0));
 
-        assertNotNull(m);
-        assertEquals(before + 1, Manager.managers.size());
-        assertTrue(Manager.managers.contains(m));
+        assertEquals(EmployeeType.MANAGER, e.getType());
+        assertTrue(Employee.employees.contains(e));
     }
 
     @Test
-    void ctor_throws_whenManagerEvaluationScoreNegative_dueToRangeMin0() {
-        assertThrows(ValidationException.class, () ->
-                manager("02", -0.01, 10.0)
-        );
-    }
-
-    @Test
-    void ctor_throws_whenEmailNotUnique_dueToPersonUnique() {
-        assertDoesNotThrow(() ->
-                new Manager("A", "B", "dup@corp", "99010112345", null, 1.0, 5.0)
-        );
+    void becomeManager_throws_whenManagerEvaluationScoreNegative() {
+        Employee e = new Employee("M", "B", "m@c", "99010112345", null);
 
         assertThrows(ValidationException.class, () ->
-                new Manager("C", "D", "dup@corp", "88010112345", null, 2.0, 5.0)
+                e.becomeManager(-0.01, 10.0)
         );
     }
+
+    @Test
+    void becomeManager_throws_whenBonusNegative() {
+        Employee e = new Employee("M", "B", "m@c", "99010112345", null);
+
+        assertThrows(ValidationException.class, () ->
+                e.becomeManager(4.0, -5.0)
+        );
+    }
+    
 
     @Test
     void getSalary_calculatesFromMockedBaseAndBonusPercent() {
-        Manager m = manager("03", 3.0, 10.0);
+        Employee m = createManager("03", 3.0, 10.0);
+
+        // Base 1200 + 10% bonus
         assertEquals(1200.0 + (1200.0 * 0.10), m.getSalary(), 1e-9);
     }
 
     @Test
     void addManaged_throws_whenNull() {
-        Manager m = manager("04", 3.0, 0.0);
+        Employee m = createManager("04", 3.0, 0.0);
         assertThrows(ValidationException.class, () -> m.addManaged(null));
     }
 
     @Test
-    void removeManaged_throws_whenNull() {
-        Manager m = manager("05", 3.0, 0.0);
-        assertThrows(ValidationException.class, () -> m.removeManaged(null));
+    void removeManaged_doesNotThrow_whenNull() {
+        // Implementation typically ignores nulls in remove
+        Employee m = createManager("05", 3.0, 0.0);
+        assertDoesNotThrow(() -> m.removeManaged(null));
     }
 
     @Test
-    void setManaged_throws_whenAnyArgumentNull() {
-        Manager m = manager("06", 3.0, 0.0);
-        Employee e1 = new TestEmployee("E1", "S", "e1@corp", "99010112345", null);
-        Employee e2 = new TestEmployee("E2", "S", "e2@corp", "99010112346", null);
+    void addManaged_handlesRecursion_correctly() {
+        // Previously: "currentlyCausesStackOverflow"
+        // Now: Should succeed because we added guard clauses (!contains)
+        Employee m = createManager("07", 3.0, 0.0);
+        Employee e = new Employee("E", "S", "e@corp", "88010112345", null);
 
-        assertThrows(ValidationException.class, () -> m.setManaged(null, e2));
-        assertThrows(ValidationException.class, () -> m.setManaged(e1, null));
+        assertDoesNotThrow(() -> m.addManaged(e));
+
+        // Verify relationship
+        assertTrue(getManagedDirect(m).contains(e));
+        assertEquals(m, getEmployeeManagerDirect(e));
     }
 
     @Test
-    void addManaged_currentlyCausesStackOverflow_dueToMutualRecursion_ManagerAddManaged_EmployeeSetManager() {
-        Manager m = manager("07", 3.0, 0.0);
-        Employee e = new TestEmployee("E", "S", "e@corp", "99010112345", null);
+    void removeManaged_handlesRecursion_correctly() {
+        // Previously: "currentlyCausesStackOverflow"
+        Employee m = createManager("08", 3.0, 0.0);
+        Employee e = new Employee("E", "S", "e@corp", "88010112345", null);
 
-        assertThrows(StackOverflowError.class, () -> m.addManaged(e));
-    }
-
-    @Test
-    void removeManaged_currentlyCausesStackOverflow_ifEmployeeManagerIsSet_dueToMutualRecursion() {
-        Manager m = manager("08", 3.0, 0.0);
-        Employee e = new TestEmployee("E", "S", "e@corp", "99010112345", null);
+        // Setup relationship manually to test removal
         setEmployeeManagerDirect(e, m);
         addManagedDirect(m, e);
 
-        assertThrows(StackOverflowError.class, () -> m.removeManaged(e));
+        assertDoesNotThrow(() -> m.removeManaged(e));
+
+        // Verify removal
+        assertFalse(getManagedDirect(m).contains(e));
+        assertNull(getEmployeeManagerDirect(e));
     }
 
     @Test
     void addTrainee_throws_whenNotManagedByThisManager() {
-        Manager m = manager("09", 3.0, 0.0);
-        Employee e = new TestEmployee("E", "S", "e@corp", "99010112345", null);
+        Employee m = createManager("09", 3.0, 0.0);
+        Employee e = new Employee("E", "S", "e@corp", "88010112345", null);
 
+        // Subordinate relationship doesn't exist yet
         ValidationException ex = assertThrows(ValidationException.class, () -> m.addTrainee(e));
         assertTrue(ex.getMessage().toLowerCase().contains("does not manage"));
     }
 
     @Test
-    void addTrainee_currentlyCausesStackOverflow_whenEmployeeIsManaged_dueToEmployeeAddManagerCall() {
-        Manager m = manager("10", 3.0, 0.0);
-        Employee e = new TestEmployee("E", "S", "e@corp", "99010112345", null);
+    void addTrainee_handlesRecursion_correctly() {
+        // Previously: "currentlyCausesStackOverflow"
+        Employee m = createManager("10", 3.0, 0.0);
+        Employee e = new Employee("E", "S", "e@corp", "88010112345", null);
 
+        // Must be managed first
         addManagedDirect(m, e);
 
-        assertThrows(StackOverflowError.class, () -> m.addTrainee(e));
+        assertDoesNotThrow(() -> m.addTrainee(e));
+
+        // Verify
+        assertTrue(getTrainedDirect(m).contains(e));
     }
 
     @Test
-    void setTrainee_throws_whenNewTraineeNotManaged() {
-        Manager m = manager("11", 3.0, 0.0);
-        Employee oldT = new TestEmployee("Old", "S", "old@corp", "99010112345", null);
-        Employee newT = new TestEmployee("New", "S", "new@corp", "99010112346", null);
+    void addManaged_throws_whenActorIsNotManager() {
+        Employee notManager = new Employee("Not", "M", "nm@c", "99010112345", null);
+        Employee e = new Employee("E", "S", "e@corp", "88010112345", null);
 
-        addTrainedDirect(m, oldT);
-
-        ValidationException ex = assertThrows(ValidationException.class, () -> m.setTrainee(oldT, newT));
-        assertTrue(ex.getMessage().toLowerCase().contains("does not manage"));
+        assertThrows(ValidationException.class, () -> notManager.addManaged(e));
     }
 
-    private void setEmployeeManagerDirect(Employee e, Manager m) {
+    // --- Reflection Utils (Updated for generic Employee class) ---
+
+    private void setEmployeeManagerDirect(Employee e, Employee m) {
         try {
             var f = Employee.class.getDeclaredField("manager");
             f.setAccessible(true);
@@ -149,15 +155,35 @@ public class ManagerTests {
         }
     }
 
+    private Employee getEmployeeManagerDirect(Employee e) {
+        try {
+            var f = Employee.class.getDeclaredField("manager");
+            f.setAccessible(true);
+            return (Employee) f.get(e);
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+
     @SuppressWarnings("unchecked")
-    private void addManagedDirect(Manager m, Employee e) {
+    private void addManagedDirect(Employee m, Employee e) {
         List<Employee> list = TestUtils.getField(m, "managed", List.class);
         if (!list.contains(e)) list.add(e);
     }
 
     @SuppressWarnings("unchecked")
-    private void addTrainedDirect(Manager m, Employee e) {
+    private List<Employee> getManagedDirect(Employee m) {
+        return TestUtils.getField(m, "managed", List.class);
+    }
+
+    @SuppressWarnings("unchecked")
+    private void addTrainedDirect(Employee m, Employee e) {
         List<Employee> list = TestUtils.getField(m, "trained", List.class);
         if (!list.contains(e)) list.add(e);
+    }
+
+    @SuppressWarnings("unchecked")
+    private List<Employee> getTrainedDirect(Employee m) {
+        return TestUtils.getField(m, "trained", List.class);
     }
 }

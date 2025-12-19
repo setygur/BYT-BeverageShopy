@@ -1,10 +1,3 @@
-import models.Cashier;
-import models.Coffee;
-import models.Fruit;
-
-import java.util.ArrayList;
-import java.util.List;
-
 public class Main {
 
     public static void main(String[] args) {
@@ -13,10 +6,10 @@ public class Main {
 //        List<String> fruitzz = new ArrayList<>();
 //        Fruit smoothie = new Fruit(fruitzz, true);
 
-        Cashier c = new Cashier(
-                "John", "Silverhand", "john@corp",
-                "99010112345", null,
-                true, "CASH-001", 4.7
-        );
+//        Cashier c = new Cashier(
+//                "John", "Silverhand", "john@corp",
+//                "99010112345", null,
+//                true, "CASH-001", 4.7
+//        );
     }
 }
