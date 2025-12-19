@@ -25,7 +25,7 @@ public class Order_Drink implements Validatable {
     private final List<String> toppings;
 
     @Derived
-    private final double additionalCost;
+    private double additionalCost;
 
     public Order_Drink(
             Order order,
@@ -34,7 +34,7 @@ public class Order_Drink implements Validatable {
             Set<SweetenerAspect> sweeteners,
             Drink_Size size,
             List<String> toppings
-    ) throws IllegalAccessException {
+    ) {
         this.order = Objects.requireNonNull(order);
         this.drink = Objects.requireNonNull(drink);
         this.temperature = Objects.requireNonNull(temperature);
@@ -44,11 +44,13 @@ public class Order_Drink implements Validatable {
                 ? new HashSet<>()
                 : new HashSet<>(sweeteners);
 
-        this.additionalCost = calculateCost();
-
-        if (!validate(this)) {
-            throw new ValidationException("Invalid Order_Drink");
+        try {
+            if (!validate(this)) throw new ValidationException("Invalid data");
+        } catch (IllegalAccessException | ValidationException e) {
+            throw new ValidationException(e.getMessage());
         }
+
+        this.additionalCost = calculateCost();
 
         order_Drinks.add(this);
     }

@@ -107,7 +107,7 @@ public class Order implements Validatable {
             Set<SweetenerAspect> sweeteners,
             Drink_Size size,
             List<String> toppings
-    ) throws IllegalAccessException {
+    ) {
         if (drink == null) throw new ValidationException("Invalid data");
         if (temperature == null) throw new ValidationException("Invalid data");
         if (size == null) throw new ValidationException("Invalid data");
