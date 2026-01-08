@@ -2,7 +2,10 @@ package models;
 
 import models.aspects.SweetenerAspect;
 import models.aspects.TemperatureAspect;
+import models.utils.DrinkType;
 import models.utils.Drink_Size;
+import models.utils.TypeOfMilk;
+import models.utils.TypeOfTea;
 import persistence.JsonCtor;
 import persistence.JsonSerializable;
 import persistence.ObjectList;
@@ -14,6 +17,9 @@ import java.util.*;
 public class Drink implements Validatable {
     @ObjectList
     public static List<Drink> drinks = new ArrayList<>();
+
+    //Flattening discriminator
+    private List<DrinkType> drinkTypes = new ArrayList<>();
 
     @NotBlank
     private String name;
@@ -27,11 +33,25 @@ public class Drink implements Validatable {
 
     private final List<Order_Drink> orders = new ArrayList<>();
 
-    // Drink types (overlapping, complete assumed)
-    private Coffee coffee;
-    private Tea tea;
-    private Milk milk;
-    private Fruit fruit;
+    /*
+
+    Classes fields
+
+     */
+
+    //Coffee fields
+    @Range(min = 1, max = 10)
+    private int caffeineLevel;
+
+    //Tea fields
+    private TypeOfTea typeOfTea;
+
+    //Milk fields
+    private TypeOfMilk typeOfMilk;
+
+    //Fruit fields
+    private List<String> fruits;
+    private boolean pulp;
 
     // Deliveries 0..*
     private final List<Delivery> deliveries = new ArrayList<>();
