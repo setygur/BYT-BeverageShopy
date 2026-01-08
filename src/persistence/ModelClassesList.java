@@ -10,14 +10,14 @@ public class ModelClassesList {
             models.FrequentCustomer.class,
             //models.Cashier.class,
             models.Certification.class,
-            models.Coffee.class,
+//            models.Coffee.class,
             models.Delivery.class,
             models.Drink.class,
             models.Facility.class,
-            models.Fruit.class,
+//            models.Fruit.class,
             //models.Loader.class,
             //models.Manager.class,
-            models.Milk.class,
+//            models.Milk.class,
             models.Order.class,
             models.Order_Drink.class,
             models.Person.class,
@@ -25,7 +25,7 @@ public class ModelClassesList {
             models.Shift.class,
             models.Shop.class,
             models.Stock.class,
-            models.Tea.class,
+//            models.Tea.class,
             models.Warehouse.class
             );
 }

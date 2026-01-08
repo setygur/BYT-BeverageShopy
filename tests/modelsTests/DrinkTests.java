@@ -18,8 +18,7 @@ public class DrinkTests {
     @BeforeEach
     void reset() {
         TestUtils.resetObjectLists(
-                Drink.class, Order.class, Order_Drink.class,
-                Coffee.class, Tea.class, Milk.class, Fruit.class
+                Drink.class, Order.class, Order_Drink.class
         );
     }
 
