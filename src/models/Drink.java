@@ -2,7 +2,10 @@ package models;
 
 import models.aspects.SweetenerAspect;
 import models.aspects.TemperatureAspect;
+import models.utils.DrinkType;
 import models.utils.Drink_Size;
+import models.utils.TypeOfMilk;
+import models.utils.TypeOfTea;
 import persistence.JsonCtor;
 import persistence.JsonSerializable;
 import persistence.ObjectList;
@@ -14,6 +17,9 @@ import java.util.*;
 public class Drink implements Validatable {
     @ObjectList
     public static List<Drink> drinks = new ArrayList<>();
+
+    //Flattening discriminator
+    private List<DrinkType> drinkTypes = new ArrayList<>();
 
     @NotBlank
     private String name;
@@ -27,14 +33,27 @@ public class Drink implements Validatable {
 
     private final List<Order_Drink> orders = new ArrayList<>();
 
-    // Drink types (overlapping, complete assumed)
-    private Coffee coffee;
-    private Tea tea;
-    private Milk milk;
-    private Fruit fruit;
+    /*
+
+    Classes fields
+
+     */
+
+    //Coffee fields
+    private int caffeineLevel;
+
+    //Tea fields
+    private TypeOfTea typeOfTea;
+
+    //Milk fields
+    private TypeOfMilk typeOfMilk;
+
+    //Fruit fields
+    private List<String> fruits;
+    private boolean pulp;
 
     // Deliveries 0..*
-    private final List<Delivery> deliveries = new ArrayList<>();
+    private List<Delivery> deliveries = new ArrayList<>();
 
     // ---------------- Constructor ----------------
 
@@ -42,19 +61,11 @@ public class Drink implements Validatable {
     public Drink(
             String name,
             double basePrice,
-            String persistentAllergens,
-            Coffee coffee,
-            Tea tea,
-            Milk milk,
-            Fruit fruit
+            String persistentAllergens
     ) {
         this.name = name;
         this.basePrice = basePrice;
         this.persistentAllergens = persistentAllergens;
-        this.coffee = coffee;
-        this.tea = tea;
-        this.milk = milk;
-        this.fruit = fruit;
 
         try {
             if (!validate(this)) throw new ValidationException("Invalid data");
@@ -182,4 +193,130 @@ public class Drink implements Validatable {
     public List<Delivery> getDeliveries() {
         return Collections.unmodifiableList(deliveries);
     }
+
+    //Type logic, add / remove
+    //Coffee
+    public void addCoffee(int caffeineLevel){
+        if(caffeineLevel < 0 || caffeineLevel > 10) throw new ValidationException("Invalid data");
+        if(!this.drinkTypes.contains(DrinkType.COFFEE)) this.drinkTypes.add(DrinkType.COFFEE);
+        this.caffeineLevel = caffeineLevel;
+    }
+
+    public void removeCoffee(){
+        this.drinkTypes.remove(DrinkType.COFFEE);
+        this.caffeineLevel = 0;
+    }
+
+    //Tea
+    public void addTea(TypeOfTea typeOfTea){
+        if(typeOfTea == null) throw new ValidationException("Invalid data");
+        if(!this.drinkTypes.contains(DrinkType.TEA))  this.drinkTypes.add(DrinkType.TEA);
+        this.typeOfTea = typeOfTea;
+    }
+
+    public void removeTea(){
+        this.drinkTypes.remove(DrinkType.TEA);
+        this.typeOfTea = null;
+    }
+
+    //Milk
+    public void addMilk(TypeOfMilk milk){
+        if(milk == null) throw new ValidationException("Invalid data");
+        if(!this.drinkTypes.contains(DrinkType.MILK))  this.drinkTypes.add(DrinkType.MILK);
+        this.typeOfMilk = milk;
+    }
+
+    public void removeMilk(){
+        this.drinkTypes.remove(DrinkType.MILK);
+        this.typeOfMilk = null;
+    }
+
+    //Fruit
+    public void addFruits(List<String> fruits, boolean pulp){
+        if(fruits == null || fruits.isEmpty()) throw new ValidationException("Invalid data");
+        if(!this.drinkTypes.contains(DrinkType.FRUIT))  this.drinkTypes.add(DrinkType.FRUIT);
+        this.fruits = fruits;
+        this.pulp = pulp;
+    }
+
+    public void addFruit(String fruit, boolean pulp){
+        if(fruit == null || fruit.isEmpty()) throw new ValidationException("Invalid data");
+        if(!this.drinkTypes.contains(DrinkType.FRUIT)) this.drinkTypes.add(DrinkType.FRUIT);
+        if(this.fruits == null) this.fruits = new ArrayList<>();
+        this.fruits.add(fruit);
+        this.pulp = pulp;
+    }
+
+    public void removeFruit(String fruit){
+        if(fruit == null || fruit.isEmpty()) throw new ValidationException("Invalid data");
+        this.fruits.remove(fruit);
+        if(this.fruits.isEmpty()){
+            this.fruits = null;
+            this.pulp = false;
+            this.drinkTypes.remove(DrinkType.FRUIT);
+        }
+    }
+
+    public void removeFruits(){
+        this.drinkTypes.remove(DrinkType.FRUIT);
+        this.fruits = null;
+        this.pulp = false;
+    }
+
+    public void addPulp(){
+        this.pulp = true;
+    }
+
+    public void removePulp(){
+        this.pulp = false;
+    }
+
+    public List<DrinkType> getDrinkTypes() {
+        return drinkTypes;
+    }
+
+    public void setDrinkTypes(List<DrinkType> drinkTypes) {
+        this.drinkTypes = drinkTypes;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public double getBasePrice() {
+        return basePrice;
+    }
+
+    public void setBasePrice(double basePrice) {
+        this.basePrice = basePrice;
+    }
+
+    public String getPersistentAllergens() {
+        return persistentAllergens;
+    }
+
+    public void setPersistentAllergens(String persistentAllergens) {
+        this.persistentAllergens = persistentAllergens;
+    }
+
+    public int getCaffeineLevel() {
+        return caffeineLevel;
+    }
+
+    public TypeOfTea getTypeOfTea() {
+        return typeOfTea;
+    }
+
+    public TypeOfMilk getTypeOfMilk() {
+        return typeOfMilk;
+    }
+
+    public List<String> getFruits() {
+        return fruits;
+    }
+
 }

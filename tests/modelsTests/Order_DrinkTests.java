@@ -22,7 +22,7 @@ public class Order_DrinkTests {
 
     @Test
     void throws_whenSizeNull() {
-        Drink drink = new Drink("TestDrink", 15.0, "None", null, null, null, null);
+        Drink drink = new Drink("TestDrink", 15.0, "None");
         Order order = new Order(1L, LocalDateTime.now(), 0.0);
 
         assertThrows(NullPointerException.class, () ->
@@ -39,7 +39,7 @@ public class Order_DrinkTests {
 
     @Test
     void throws_whenToppingsNull() {
-        Drink drink = new Drink("TestDrink", 15.0, "None", null, null, null, null);
+        Drink drink = new Drink("TestDrink", 15.0, "None");
         Order order = new Order(1L, LocalDateTime.now(), 0.0);
 
         assertThrows(NullPointerException.class, () ->
@@ -56,7 +56,7 @@ public class Order_DrinkTests {
 
     @Test
     void createsOrderDrink_whenValid() {
-        Drink drink = new Drink("TestDrink", 15.0, "None", null, null, null, null);
+        Drink drink = new Drink("TestDrink", 15.0, "None");
         Order order = new Order(1L, LocalDateTime.now(), 0.0);
 
         Order_Drink od = assertDoesNotThrow(() ->
@@ -76,7 +76,7 @@ public class Order_DrinkTests {
 
     @Test
     void additionalCost_smallNoToppingsNoSweeteners() {
-        Drink drink = new Drink("D", 10.0, "none", null, null, null, null);
+        Drink drink = new Drink("D", 10.0, "none");
         Order order = new Order(1L, LocalDateTime.now(), 0.0);
 
         Order_Drink od = new Order_Drink(
@@ -93,7 +93,7 @@ public class Order_DrinkTests {
 
     @Test
     void additionalCost_xxlWith3ToppingsAnd2Sweeteners() {
-        Drink drink = new Drink("D", 10.0, "none", null, null, null, null);
+        Drink drink = new Drink("D", 10.0, "none");
         Order order = new Order(1L, LocalDateTime.now(), 0.0);
 
         ArrayList<String> toppings = new ArrayList<>(List.of("a", "b", "c"));
@@ -113,7 +113,7 @@ public class Order_DrinkTests {
 
     @Test
     void equals_trueForSameValues() {
-        Drink drink = new Drink("D", 10.0, "none", null, null, null, null);
+        Drink drink = new Drink("D", 10.0, "none");
         Order order = new Order(1L, LocalDateTime.now(), 0.0);
 
         Order_Drink a = new Order_Drink(
@@ -140,7 +140,7 @@ public class Order_DrinkTests {
 
     @Test
     void find_returnsExisting_whenValuesEqual_notByReference() {
-        Drink drink = new Drink("D", 10.0, "none", null, null, null, null);
+        Drink drink = new Drink("D", 10.0, "none");
         Order order = new Order(1L, LocalDateTime.now(), 0.0);
 
         Order_Drink od = new Order_Drink(

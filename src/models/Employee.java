@@ -41,6 +41,9 @@ public class Employee extends Person {
 
      */
 
+    //TODO remove annotations to role specific attributes, because this will prevent object creation.
+    // Move validation to role specific methods.
+
     //loader fields
     @Range(min = 0)
     private Double loaderEvaluationScore;

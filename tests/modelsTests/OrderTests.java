@@ -63,7 +63,7 @@ public class OrderTests {
     @Test
     void getTotalPrice_sumsDrinksAndTip() {
         Order o = new Order(1L, LocalDateTime.now(), 2.0);
-        Drink d = new Drink("D", 10.0, "none", null, null, null, null);
+        Drink d = new Drink("D", 10.0, "none");
 
         o.addDrink(
                 d,
@@ -175,7 +175,7 @@ public class OrderTests {
     @Test
     void addDrink_addsAndBackLinks_correctly() {
         Order o = new Order(1L, LocalDateTime.now(), 0.0);
-        Drink d = new Drink("D", 5.0, "none", null, null, null, null);
+        Drink d = new Drink("D", 5.0, "none");
 
         o.addDrink(
                 d,

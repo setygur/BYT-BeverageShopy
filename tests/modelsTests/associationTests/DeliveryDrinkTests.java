@@ -20,8 +20,8 @@ public class DeliveryDrinkTests {
                 null
         );
 
-        Drink coffee = new Drink("Mocha", 3.0, "milk", null, null, null, null);
-        Drink tea    = new Drink("Tea", 2.0, "none", null, new Tea(TypeOfTea.JASMINE), null, null);
+        Drink coffee = new Drink("Mocha", 3.0, "milk");
+        Drink tea    = new Drink("Tea", 2.0, "none");
 
         delivery.addDrink(coffee);
         delivery.addDrink(tea);
