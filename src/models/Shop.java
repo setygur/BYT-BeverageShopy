@@ -23,10 +23,13 @@ public class Shop implements Validatable {
     @NotFuture
     private LocalDateTime dateOfLastStock;
 
+    @NotNull
+    private Facility facility;
+
     private Map<OrderQualifier, Order> orders = new HashMap<>();
 
     @JsonCtor
-    public Shop(LocalDateTime dateOfLastStock) {
+    public Shop(Facility facility, LocalDateTime dateOfLastStock) {
         this.dateOfLastStock = dateOfLastStock;
 
         try {
@@ -34,6 +37,12 @@ public class Shop implements Validatable {
         } catch (IllegalAccessException | ValidationException e) {
             throw new ValidationException(e.getMessage());
         }
+
+        if (facility == null)
+            throw new ValidationException("Shop cannot exist without a Facility (Composition)");
+
+        this.facility = facility;
+        facility.addShop(this);
 
         this.salesNum = 0;
 
@@ -88,5 +97,14 @@ public class Shop implements Validatable {
     public int getDaysFromLastStock() {
         if (dateOfLastStock == null) return 0;
         return (int) ChronoUnit.DAYS.between(dateOfLastStock.toLocalDate(), LocalDate.now());
+    }
+
+    public void removeConnection() {
+        if (facility != null) {
+            Facility tmp = facility;
+            facility = null;
+            tmp.removeShop();
+            shops.remove(this);
+        }
     }
 }

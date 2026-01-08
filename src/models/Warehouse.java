@@ -14,6 +14,9 @@ public class Warehouse implements Validatable {
     public static List<Warehouse> warehouses = new ArrayList<>();
 
     @NotNull
+    private Facility facility; // The owner
+
+    @NotNull
     @Range(min = 0)
     private double capacity;
 
@@ -28,7 +31,12 @@ public class Warehouse implements Validatable {
     private boolean temperatureControlled;
 
     @JsonCtor
-    public Warehouse(double capacity, boolean temperatureControlled) {
+    public Warehouse(Facility facility, double capacity, boolean temperatureControlled) {
+        if (facility == null) {
+            throw new ValidationException("Warehouse cannot exist without a Certificate (Composition)");
+        }
+
+        this.facility = facility;
         this.capacity = capacity;
         this.temperatureControlled = temperatureControlled;
 
@@ -37,6 +45,7 @@ public class Warehouse implements Validatable {
         } catch (Exception e) {
             throw new ValidationException(e.getMessage());
         }
+        this.facility.addWarehouse(this);
         warehouses.add(this);
     }
 
@@ -63,4 +72,12 @@ public class Warehouse implements Validatable {
         return deliveries;
     }
 
+    public void removeConnection() {
+        if (facility != null) {
+            Facility tmp = facility;
+            facility = null;
+            tmp.removeWarehouse();
+            warehouses.remove(this);
+        }
+    }
 }

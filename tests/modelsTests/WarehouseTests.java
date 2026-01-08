@@ -1,7 +1,9 @@
-package tests.modelsTests;
+package modelsTests;
 
 
 import models.Warehouse;
+import models.Facility;
+import models.utils.Address;
 import org.junit.jupiter.api.Test;
 import validation.ValidationException;
 
@@ -11,6 +13,7 @@ public class WarehouseTests {
 
     @Test
     void throws_whenCapacityNegative() {
-        assertThrows(ValidationException.class, () -> new Warehouse(-5, true));
+        Facility f = new Facility(new Address("City", "Street", "Building", 11111));
+        assertThrows(ValidationException.class, () -> new Warehouse(f, -5, true));
     }
 }

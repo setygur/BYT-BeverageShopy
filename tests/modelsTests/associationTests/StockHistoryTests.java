@@ -21,7 +21,7 @@ public class StockHistoryTests {
         assertEquals(0, s.getDeliveryHistory().size());
 
         // Create a delivery (from a warehouse for now)
-        Warehouse w = new Warehouse(1000, false);
+        Warehouse w = new Warehouse(f, 1000, false);
 
         Delivery d = new Delivery(
                 LocalDateTime.now().minusHours(1),
@@ -48,7 +48,7 @@ public class StockHistoryTests {
         Facility f = new Facility(new Address("City2", "Street2", "B2", 22222));
         Stock s = f.getStock();
 
-        Warehouse w = new Warehouse(2000, true);
+        Warehouse w = new Warehouse(f, 2000, true);
 
         Delivery d1 = new Delivery(LocalDateTime.now().minusHours(3), null, 150, Status.ENROUTE, w);
         Delivery d2 = new Delivery(LocalDateTime.now().minusHours(2), null, 100, Status.PENDING, w);

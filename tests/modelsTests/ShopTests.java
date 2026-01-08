@@ -1,8 +1,8 @@
 package modelsTests;
 
 import models.*;
+import models.utils.Address;
 import models.utils.OrderQualifier;
-import models.utils.EmployeeType;
 import modelsTests.utilTests.TestUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
+import models.Facility;
 
 public class ShopTests {
 
@@ -34,7 +35,8 @@ public class ShopTests {
     @Test
     void ctor_addsToStaticList_whenValid() {
         int before = Shop.shops.size();
-        Shop s = new Shop(LocalDateTime.now());
+        Facility f = new Facility(new Address("City", "Street", "Building", 11111));
+        Shop s = new Shop(f, LocalDateTime.now());
 
         assertNotNull(s);
         assertEquals(before + 1, Shop.shops.size());
@@ -43,30 +45,39 @@ public class ShopTests {
 
     @Test
     void ctor_throws_whenDateOfLastStockNull() {
-        assertThrows(ValidationException.class, () -> new Shop(null));
+        assertThrows(ValidationException.class, () -> new Shop(
+            new Facility(new Address("City", "Street", "Building", 11111)),
+            null
+        ));
     }
 
     @Test
     void ctor_throws_whenDateOfLastStockInFuture() {
-        assertThrows(ValidationException.class, () -> new Shop(LocalDateTime.now().plusDays(1)));
+        assertThrows(ValidationException.class, () -> new Shop(
+            new Facility(new Address("City", "Street", "Building", 11111)),
+            LocalDateTime.now().plusDays(1)
+        ));
     }
 
     @Test
     void getDaysFromLastStock_returnsZero_whenToday() {
-        Shop s = new Shop(LocalDateTime.now());
+        Facility f = new Facility(new Address("City", "Street", "Building", 11111));
+        Shop s = new Shop(f, LocalDateTime.now());
         assertEquals(0, s.getDaysFromLastStock());
     }
 
     @Test
     void getDaysFromLastStock_returnsPositive_forPastDate() {
-        Shop s = new Shop(LocalDateTime.now().minusDays(3));
+        Facility f = new Facility(new Address("City", "Street", "Building", 11111));
+        Shop s = new Shop(f, LocalDateTime.now().minusDays(3));
         int days = s.getDaysFromLastStock();
         assertTrue(days >= 3, "Expected at least 3 days; got " + days);
     }
 
     @Test
     void addOrder_throws_whenAnyArgumentNull() {
-        Shop s = new Shop(LocalDateTime.now());
+        Facility f = new Facility(new Address("City", "Street", "Building", 11111));
+        Shop s = new Shop(f, LocalDateTime.now());
         Employee c = createCashier("01");
         Order o = new Order(1L, LocalDateTime.now(), 0.0);
 
@@ -78,7 +89,8 @@ public class ShopTests {
     @Test
     void addOrder_throws_whenActorIsNotCashier() {
         // New Test: Ensure we can't pass a regular Employee (or Manager/Loader) as a Cashier
-        Shop s = new Shop(LocalDateTime.now());
+        Facility f = new Facility(new Address("City", "Street", "Building", 11111));
+        Shop s = new Shop(f, LocalDateTime.now());
         Employee notCashier = new Employee("Not", "C", "nc@c", "99010112345", null);
         Order o = new Order(1L, LocalDateTime.now(), 0.0);
 
@@ -90,7 +102,8 @@ public class ShopTests {
 
     @Test
     void removeOrder_throws_whenAnyArgumentNull() {
-        Shop s = new Shop(LocalDateTime.now());
+        Facility f = new Facility(new Address("City", "Street", "Building", 11111));
+        Shop s = new Shop(f, LocalDateTime.now());
         Employee c = createCashier("02");
         Order o = new Order(1L, LocalDateTime.now(), 0.0);
 
@@ -101,7 +114,8 @@ public class ShopTests {
 
     @Test
     void setOrder_throws_whenAnyArgumentNull() {
-        Shop s = new Shop(LocalDateTime.now());
+        Facility f = new Facility(new Address("City", "Street", "Building", 11111));
+        Shop s = new Shop(f, LocalDateTime.now());
         Employee c = createCashier("03");
 
         // Assuming OrderQualifier constructor now accepts (LocalDateTime, Employee)
@@ -121,7 +135,8 @@ public class ShopTests {
     void addOrder_handlesRecursion_correctly() {
         // Previously: "currentlyCausesStackOverflow"
         // Now: Should pass without error if guards are implemented correctly
-        Shop s = new Shop(LocalDateTime.now());
+        Facility f = new Facility(new Address("City", "Street", "Building", 11111));
+        Shop s = new Shop(f, LocalDateTime.now());
         Employee c = createCashier("52");
         LocalDateTime t = LocalDateTime.now();
         Order o = new Order(1L, t, 0.0);
@@ -135,7 +150,8 @@ public class ShopTests {
 
     @Test
     void getOrder_returnsMappedOrder_whenInsertedDirectlyIntoOrdersMap() {
-        Shop s = new Shop(LocalDateTime.now());
+        Facility f = new Facility(new Address("City", "Street", "Building", 11111));
+        Shop s = new Shop(f, LocalDateTime.now());
         Employee c = createCashier("05");
         LocalDateTime t = LocalDateTime.now();
         Order o = new Order(1L, t, 0.0);

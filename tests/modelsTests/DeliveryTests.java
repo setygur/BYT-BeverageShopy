@@ -2,8 +2,10 @@ package modelsTests;
 
 import models.Delivery;
 import models.Warehouse;
+import models.utils.Address;
 import models.utils.Status;
 import org.junit.jupiter.api.Test;
+import models.Facility;
 
 import java.time.LocalDateTime;
 
@@ -13,7 +15,8 @@ public class DeliveryTests {
 
     @Test
     void deliveryConnectsToWarehouse_whenWarehouseProvided() {
-        Warehouse w1 = new Warehouse(5000, false);
+        Facility f = new Facility(new Address("City", "Street", "Building", 11111));
+        Warehouse w1 = new Warehouse(f, 5000, false);
 
         LocalDateTime start = LocalDateTime.now().minusHours(2);
 
