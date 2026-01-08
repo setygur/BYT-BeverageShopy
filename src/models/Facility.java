@@ -17,6 +17,8 @@ public class Facility implements Validatable {
 
     private Warehouse warehouse; // 0..1 composed Warehouse
 
+    private Shop shop; // 0..1 composed Shop
+
     @ObjectList
     private final List<Shift> shifts = new ArrayList<>(); // 1..*
 
@@ -94,5 +96,24 @@ public class Facility implements Validatable {
 
     public Optional<Warehouse> getWarehouse() {
         return Optional.ofNullable(warehouse);
+    }
+
+    public void addShop(Shop shop) {
+        if (shop == null) throw new ValidationException("Invalid data");
+        if (this.shop != null)
+            throw new ValidationException("Facility can have only one Shop");
+
+        this.shop = shop;
+    }
+
+    public void removeShop() {
+        if (this.shop != null) {
+            this.shop.removeConnection();
+            this.shop = null;
+        }
+    }
+
+    public Optional<Shop> getShop() {
+        return Optional.ofNullable(shop);
     }
 }

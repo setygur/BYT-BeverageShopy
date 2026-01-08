@@ -2,6 +2,7 @@ package modelsTests;
 
 import models.*;
 import models.aspects.*;
+import models.utils.Address;
 import models.utils.Drink_Size;
 import models.utils.OrderQualifier;
 import modelsTests.utilTests.TestUtils;
@@ -94,8 +95,10 @@ public class OrderTests {
     @Test
     void setShop_throws_whenAnyArgumentNull() {
         Order o = new Order(1L, LocalDateTime.now(), 0.0);
-        Shop s1 = new Shop(LocalDateTime.now());
-        Shop s2 = new Shop(LocalDateTime.now());
+        Facility f1 = new Facility(new Address("City", "Street", "Building", 11111));
+        Facility f2 = new Facility(new Address("City", "Street", "Building", 22222));
+        Shop s1 = new Shop(f1, LocalDateTime.now());
+        Shop s2 = new Shop(f2, LocalDateTime.now());
 
         assertThrows(ValidationException.class, () -> o.setShop(null, s2));
         assertThrows(ValidationException.class, () -> o.setShop(s1, null));
@@ -106,7 +109,8 @@ public class OrderTests {
         // Previously: "currentlyCausesStackOverflow"
         // Fix: Standard bidirectional logic with (!contains) guards prevents this.
         Order o = new Order(1L, LocalDateTime.now(), 0.0);
-        Shop s = new Shop(LocalDateTime.now());
+        Facility f = new Facility(new Address("City", "Street", "Building", 11111));
+        Shop s = new Shop(f, LocalDateTime.now());
 
         assertDoesNotThrow(() -> o.addShop(s));
     }
@@ -114,7 +118,8 @@ public class OrderTests {
     @Test
     void removeShop_whenShopIsSetDirectly_unlinksWithoutRecursingIntoShop() {
         Order o = new Order(1L, LocalDateTime.now(), 0.0);
-        Shop s = new Shop(LocalDateTime.now());
+        Facility f = new Facility(new Address("City", "Street", "Building", 11111));
+        Shop s = new Shop(f, LocalDateTime.now());
 
         assertDoesNotThrow(() -> o.addShop(s));
 
