@@ -7,12 +7,6 @@ import validation.*;
 
 import java.util.*;
 
-/**
- * Employee remains a subtype of Person (Option A).
- * - Uses ObjectList static list like before (authoritative in-memory registry).
- * - Encapsulates mutable collections.
- * - Provides a robust removeConnection() that safely unlinks associations and unregisters.
- */
 public class Employee extends Person {
 
     @ObjectList
@@ -28,7 +22,7 @@ public class Employee extends Person {
     // Flattening discriminator
     private EmployeeType type = EmployeeType.NONE;
 
-    // Encapsulated associations
+
     private final List<Shift> shifts = new ArrayList<>();
     @ObjectList
     private final List<Certification> certifications = new ArrayList<>();
@@ -36,12 +30,12 @@ public class Employee extends Person {
     private Employee manager;
     private Employee trainer;
 
-    // Loader role
+    // Loader
     @Range(min = 0)
     private Double loaderEvaluationScore;
     private List<Delivery> deliveries;
 
-    // Manager role
+    // Manager
     @Range(min = 0)
     private Double managerEvaluationScore;
     @Range(min = 0)
@@ -49,7 +43,7 @@ public class Employee extends Person {
     private List<Employee> managed;
     private List<Employee> trained;
 
-    // Cashier role
+    // Cashier
     private Boolean handlesCash;
     @Unique
     private String cashierId;
@@ -69,11 +63,9 @@ public class Employee extends Person {
         if (peselNumber == null && passportNumber == null)
             throw new ValidationException("Either PESEL or passport must be provided");
 
-        // register in the static ObjectList as before
         register();
     }
 
-    // registration helpers (use ObjectList static list)
     private void register() {
         if (!employees.contains(this)) employees.add(this);
     }
@@ -82,10 +74,7 @@ public class Employee extends Person {
         employees.remove(this);
     }
 
-    // Switching logic
-    // Erase role-specific data to prevent zombie state
     private void clearRoles() {
-        // 1. Cleanup Loader
         if (this.type == EmployeeType.LOADER && deliveries != null) {
             for (Delivery d : new ArrayList<>(deliveries)) {
                 d.removeLoader(this);
@@ -93,8 +82,7 @@ public class Employee extends Person {
             this.deliveries = null;
             this.loaderEvaluationScore = null;
         }
-
-        // 2. Cleanup Manager
+        
         if (this.type == EmployeeType.MANAGER && managed != null) {
             // Unlink subordinates
             for (Employee e : new ArrayList<>(managed)) {
@@ -112,8 +100,7 @@ public class Employee extends Person {
             this.managerEvaluationScore = null;
             this.bonusPercent = null;
         }
-
-        // 3. Cleanup Cashier
+    
         if (this.type == EmployeeType.CASHIER && orders != null) {
             for (Order o : new ArrayList<>(orders)) {
                 o.removeCashier(this);
@@ -130,7 +117,7 @@ public class Employee extends Person {
     public void becomeLoader(double score) {
         if (score < 0) throw new ValidationException("Score cannot be negative");
 
-        clearRoles(); // Wipe previous identity
+        clearRoles();
 
         this.type = EmployeeType.LOADER;
         this.loaderEvaluationScore = score;
@@ -141,7 +128,7 @@ public class Employee extends Person {
         if (score < 0) throw new ValidationException("Score cannot be negative");
         if (bonusPercent < 0) throw new ValidationException("Bonus cannot be negative");
 
-        clearRoles(); // Wipe previous identity
+        clearRoles();
 
         this.type = EmployeeType.MANAGER;
         this.managerEvaluationScore = score;
@@ -154,7 +141,7 @@ public class Employee extends Person {
         if (cashierId == null || cashierId.isBlank()) throw new ValidationException("Cashier ID required");
         if (score < 0) throw new ValidationException("Score cannot be negative");
 
-        clearRoles(); // Wipe previous identity
+        clearRoles(); 
 
         this.type = EmployeeType.CASHIER;
         this.handlesCash = handlesCash;
@@ -177,7 +164,7 @@ public class Employee extends Person {
             case CASHIER:
                 return calculateCashierSalary();
             default:
-                return baseSalary; // Fallback for basic employee
+                return baseSalary;
         }
     }
 
@@ -190,8 +177,6 @@ public class Employee extends Person {
         // Constants logic
         double hourlyRate = 25.0;
         double deliveryBonus = 125.0;
-
-        // Mock calculation of hours from shifts
         double totalHours = shifts.size() * 8.0;
         int deliveryCount = deliveries == null ? 0 : deliveries.size();
 
@@ -373,7 +358,7 @@ public class Employee extends Person {
         if (shifts.contains(shift)) {
             shifts.remove(shift);
 
-            // This assumes Shift.removeEmployee(Employee e) only unlinks without invoking removeConnection()
+            // this assumes Shift.removeEmployee(Employee e) only unlinks without invoking removeConnection()
             shift.removeEmployee(this);
         }
     }
