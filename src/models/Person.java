@@ -33,7 +33,7 @@ public abstract class Person implements Validatable {
 
     // Method for Employee
     public void removeConnection() {
-        // default: nothing to remove for plain Person
+        
     }
 
     // helper method
@@ -50,7 +50,7 @@ public abstract class Person implements Validatable {
         return sj.toString();
     }
 
-    // Keep original getters/setters if other code relies on direct field access via reflection/serialization.
+    //generic
     public String getName() {
         return name;
     }
