@@ -5,7 +5,10 @@ import persistence.JsonSerializable;
 import validation.NotBlank;
 import validation.Unique;
 import validation.Validatable;
+import validation.ValidationException;
+
 import java.util.StringJoiner;
+
 
 @JsonSerializable
 public abstract class Person implements Validatable {
@@ -28,6 +31,16 @@ public abstract class Person implements Validatable {
         //TODO add custom validation for email
     }
 
+    // Method for Employee
+    public void removeConnection() {
+        // default: nothing to remove for plain Person
+    }
+
+    // helper method
+    public final void destroy() {
+        removeConnection();
+    }
+
     @Override
     public String toString() {
         StringJoiner sj = new StringJoiner(", ");
@@ -35,5 +48,33 @@ public abstract class Person implements Validatable {
         sj.add(this.surname);
         sj.add(this.email);
         return sj.toString();
+    }
+
+    // Keep original getters/setters if other code relies on direct field access via reflection/serialization.
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        if (name == null || name.isBlank()) throw new ValidationException("Name cannot be blank");
+        this.name = name;
+    }
+
+    public String getSurname() {
+        return surname;
+    }
+
+    public void setSurname(String surname) {
+        if (surname == null || surname.isBlank()) throw new ValidationException("Surname cannot be blank");
+        this.surname = surname;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        if (email == null || email.isBlank()) throw new ValidationException("Email cannot be blank");
+        this.email = email;
     }
 }
